@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>포항→속초 4박5일 동해안 드라이브 · PC 전용 (2026.11.2~11.6)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* 1차 CDN이 막힌 환경(사내망·기내·일부 모바일망)에서는 2차 CDN으로 재시도 */
+if(typeof L === 'undefined'){
+  document.write('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">');
+  document.write('<scr'+'ipt src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/scr'+'ipt>');
+}
+</script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { min-width:1180px; height:100%; font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; background:#0e1420; color:#e8ecf2; overflow:hidden; }
+  #map { position:absolute; inset:0; z-index:1; }
+
+  /* 상단 영역 : 데스크톱에선 각자 절대배치, 모바일에선 하나의 상단 바 */
+  .topbar { display:contents; }
+  .brand { position:absolute; top:16px; left:16px; z-index:1000; font-size:13px; color:#8b96ab; letter-spacing:.3px; }
+  .brand b { color:#e8ecf2; font-size:15px; }
+  .brand i { font-style:normal; }
+  .brand i::before { content:' · '; }
+
+  /* 일차 탭 */
+  .tabs { position:absolute; top:44px; left:16px; z-index:1000; display:flex; gap:8px; flex-wrap:wrap; max-width:calc(100% - 460px); }
+  .tab { background:#1b2333; color:#cfd6e2; border:1px solid #2c3850; border-radius:24px; padding:8px 15px; font-size:14px; font-weight:bold; cursor:pointer; transition:.15s; }
+  .tab:hover { background:#26314a; }
+  .tab.on { background:#fff; color:#111; border-color:#fff; }
+  .tab small { display:block; font-size:10px; font-weight:normal; opacity:.7; }
+  .tab.all { background:linear-gradient(90deg,#5b8def,#2ecc9a,#f39c3d,#b57bee,#e8734a); color:#fff; border-color:transparent; }
+  .tab.all.on { box-shadow:0 0 0 2.5px #fff; color:#fff; }
+
+  /* 레이어 토글 + 범례 */
+  .layers { position:absolute; left:16px; bottom:16px; z-index:1000; background:rgba(16,22,34,.94); border:1px solid #253048;
+    border-radius:12px; padding:10px 12px; font-size:11.5px; color:#aeb8c9; width:196px; }
+  .layers h4 { font-size:10.5px; color:#7f8ba1; letter-spacing:.8px; margin-bottom:7px; font-weight:bold; }
+  .lrow { display:flex; align-items:center; gap:8px; padding:4px 6px; border-radius:7px; cursor:pointer; user-select:none; transition:.12s; }
+  .lrow:hover { background:#1c2437; }
+  .lrow .sw { width:19px; height:19px; min-width:19px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10.5px; border:2px solid #fff; }
+  .lrow .lb { flex:1; color:#cfd6e2; font-weight:bold; }
+  .lrow .ck { width:15px; height:15px; border-radius:4px; border:1.5px solid #3a4a68; display:flex; align-items:center; justify-content:center; font-size:10px; color:#0e1420; }
+  .lrow.off { opacity:.4; }
+  .lrow.on .ck { background:#5b8def; border-color:#5b8def; }
+  .ldiv { border-top:1px solid #202b40; margin:8px 0 6px; padding-top:7px; }
+  .ldays { display:flex; flex-wrap:wrap; gap:5px 9px; font-size:10.5px; }
+  .ldays span i { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:4px; vertical-align:0px; }
+
+  /* 우측 패널 */
+  .panel { position:absolute; top:16px; right:16px; bottom:16px; width:420px; max-width:calc(100% - 32px);
+    background:#141b29; border:1px solid #253048; border-radius:16px; z-index:1000;
+    display:flex; flex-direction:column; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.5); }
+  .panel-head { padding:16px 18px 0; border-bottom:1px solid #202b40; }
+  .p-day { font-size:12.5px; color:#9aa6ba; }
+  .p-title { font-size:19px; font-weight:800; line-height:1.35; margin:3px 0 6px; }
+  .p-sub { font-size:12.5px; color:#aeb8c9; line-height:1.5; margin-bottom:10px; }
+  .p-meta { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .chip { font-size:11px; background:#1b2333; border:1px solid #2c3850; border-radius:7px; padding:3px 8px; color:#9fb0c8; }
+  .subtabs { display:flex; gap:4px; }
+  .stab { flex:1; background:none; border:none; border-bottom:2px solid transparent; color:#8b96ab; font-size:12.5px;
+    font-weight:bold; padding:9px 2px; cursor:pointer; font-family:inherit; }
+  .stab:hover { color:#cfd6e2; }
+  .stab.on { color:#fff; border-bottom-color:#5b8def; }
+
+  .panel-scroll { overflow-y:auto; padding:16px 18px 22px; flex:1; }
+  .panel-scroll::-webkit-scrollbar { width:8px; }
+  .panel-scroll::-webkit-scrollbar-thumb { background:#2c3850; border-radius:4px; }
+
+  .route-btn { display:inline-flex; align-items:center; gap:7px; background:#fff; color:#111; border:none;
+    border-radius:9px; padding:8px 14px; font-size:13px; font-weight:bold; cursor:pointer; text-decoration:none; margin-bottom:14px; }
+  .route-btn:hover { background:#e8ecf2; }
+  .sect { font-size:12px; font-weight:bold; color:#7f8ba1; letter-spacing:1px; margin:16px 0 8px; text-transform:uppercase; }
+  .card { display:flex; gap:11px; background:#1b2333; border:1px solid #253048; border-radius:12px; padding:11px; margin-bottom:9px; cursor:pointer; transition:.15s; }
+  .card:hover, .card.hl { border-color:#5b8def; background:#20293e; }
+  .card.roadcard { background:#16202f; border-style:dashed; }
+  .card .ic { width:46px; height:46px; min-width:46px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:23px; background:#26314a; }
+  .card .t { font-size:11.5px; color:#9aa6ba; }
+  .card .nm { font-size:14px; font-weight:bold; margin:1px 0 3px; line-height:1.35; }
+  .card .nm .num { display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border-radius:50%; background:#5b8def; color:#fff; font-size:10.5px; margin-right:5px; vertical-align:1px; }
+  .card .ds { font-size:12px; color:#aeb8c9; line-height:1.5; }
+  .card .ad { font-size:11px; color:#7f8ba1; margin-top:4px; }
+  .badge { display:inline-block; font-size:10.5px; padding:1px 7px; border-radius:9px; margin-left:4px; vertical-align:1px; font-weight:normal; }
+  .b-must { background:#3d2430; color:#ff8fa3; } .b-food { background:#3a2f1c; color:#ffd166; }
+  .b-inland { background:#1d3326; color:#7ed9a0; } .b-night { background:#2a2440; color:#c3b1ff; }
+  .b-road { background:#16324a; color:#6ec6ff; } .b-photo { background:#3b2340; color:#f19bff; }
+  .b-new { background:#123a34; color:#5fe0c0; }
+  .tag { display:inline-block; font-size:10.5px; background:#222c42; color:#9fb0c8; border-radius:6px; padding:1px 7px; margin:4px 4px 0 0; }
+  .stay-note { background:#1a2438; border-left:3px solid #5b8def; border-radius:0 10px 10px 0; padding:10px 13px; margin-top:12px; font-size:12.5px; color:#cfd6e2; line-height:1.55; }
+  .drivebar { font-size:12px; color:#9aa6ba; background:#161d2c; border:1px solid #202b40; border-radius:9px; padding:9px 12px; margin-top:12px; line-height:1.6; }
+  .warn { font-size:12px; color:#ffc9a3; background:#2a1e17; border:1px solid #4a3325; border-radius:9px; padding:9px 12px; margin-bottom:12px; line-height:1.6; }
+
+  /* 마커 */
+  .mk { display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%;
+    color:#fff; font-weight:800; font-size:13px; border:2.5px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,.6); }
+  .mk.inland-mk { border-color:#7ed9a0; }
+  .mk.poi { width:26px; height:26px; font-size:14px; border-width:2px; }
+  .mk.dot { width:13px; height:13px; border-width:1.5px; }
+  /* 아이콘 핀 (포토존·맛집·드론·숙박) */
+  .pin { width:27px; height:27px; border-radius:50% 50% 50% 3px; transform:rotate(-45deg);
+    border:2px solid #fff; box-shadow:0 3px 7px rgba(0,0,0,.65); display:flex; align-items:center; justify-content:center; }
+  .pin b { transform:rotate(45deg); font-size:13px; line-height:1; font-weight:normal; }
+  .pin.sm { width:22px; height:22px; } .pin.sm b { font-size:11px; }
+  .mk-label { background:rgba(10,14,22,.85); color:#fff; border:none; border-radius:6px; padding:2px 8px; font-size:11.5px; font-weight:bold; box-shadow:none; white-space:nowrap; }
+  .mk-label.tiny { font-size:10.5px; padding:1px 6px; background:rgba(10,14,22,.75); }
+  .leaflet-tooltip-top.mk-label::before { border-top-color:rgba(10,14,22,.85); }
+
+  /* 전체보기 패널 */
+  .daycard { display:flex; gap:11px; align-items:flex-start; background:#1b2333; border:1px solid #253048; border-left:4px solid #5b8def;
+    border-radius:10px; padding:11px 12px; margin-bottom:9px; cursor:pointer; transition:.15s; }
+  .daycard:hover { background:#20293e; border-color:#5b8def; }
+  .daycard .dn { font-size:11.5px; color:#9aa6ba; }
+  .daycard .dt { font-size:13.5px; font-weight:bold; margin:2px 0 4px; line-height:1.35; }
+  .daycard .dm { font-size:11px; color:#8b96ab; line-height:1.6; }
+  .daycard .go { font-size:11px; color:#6ec6ff; margin-top:5px; }
+  .sumgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:14px; }
+  .sumbox { background:#1b2333; border:1px solid #253048; border-radius:10px; padding:9px 6px; text-align:center; }
+  .sumbox .v { font-size:17px; font-weight:800; }
+  .sumbox .k { font-size:10.5px; color:#8b96ab; margin-top:2px; }
+
+  /* ===== 상세 정보 레이어(모달) ===== */
+  .modal { position:fixed; inset:0; z-index:3000; background:rgba(6,9,16,.72); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; padding:24px; }
+  .modal.open { display:flex; animation:fade .18s ease; }
+  @keyframes fade { from{opacity:0} to{opacity:1} }
+  .msheet { width:520px; max-width:100%; max-height:86vh; background:#141b29; border:1px solid #2c3850; border-radius:18px;
+    box-shadow:0 20px 60px rgba(0,0,0,.7); display:flex; flex-direction:column; overflow:hidden; animation:pop .22s cubic-bezier(.2,.9,.3,1.2); }
+  @keyframes pop { from{transform:translateY(14px) scale(.97);opacity:0} to{transform:none;opacity:1} }
+  .mhead { display:flex; gap:13px; align-items:flex-start; padding:20px 20px 16px; border-bottom:1px solid #202b40; }
+  .m-ic { width:54px; height:54px; min-width:54px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:27px; }
+  .m-kind { font-size:12px; color:#9aa6ba; font-weight:bold; }
+  .m-title { font-size:21px; font-weight:800; line-height:1.3; margin-top:3px; }
+  .mclose { margin-left:auto; background:#1b2333; border:1px solid #2c3850; color:#9aa6ba; width:30px; height:30px;
+    min-width:30px; border-radius:9px; font-size:16px; cursor:pointer; line-height:1; }
+  .mclose:hover { background:#26314a; color:#fff; }
+  .m-body { padding:18px 20px; overflow-y:auto; flex:1; }
+  .m-body::-webkit-scrollbar { width:8px; }
+  .m-body::-webkit-scrollbar-thumb { background:#2c3850; border-radius:4px; }
+  .m-photo { position:relative; height:250px; margin:-18px -20px 18px; overflow:hidden; background:linear-gradient(135deg,#1f2c43,#0f1624); }
+  .m-photo::after { content:''; position:absolute; inset:auto 0 0; height:45%; background:linear-gradient(transparent,rgba(7,10,17,.84)); pointer-events:none; }
+  .m-photo img { display:block; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .28s ease; }
+  .m-photo.ready img { opacity:1; }
+  .m-photo-status { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:8px; color:#aeb8c9; font-size:12px; }
+  .m-photo.ready .m-photo-status { display:none; }
+  .m-photo-credit { position:absolute; z-index:1; left:14px; right:14px; bottom:10px; color:#dce4f0; font-size:10.5px; line-height:1.4; text-shadow:0 1px 4px #000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .m-photo-credit a { color:#fff; text-decoration:none; border-bottom:1px solid rgba(255,255,255,.5); }
+  .mds { font-size:14px; line-height:1.72; color:#dbe2ec; }
+  .mtable { margin-top:14px; border:1px solid #202b40; border-radius:11px; overflow:hidden; }
+  .mrow { display:flex; gap:10px; padding:9px 13px; font-size:12.5px; color:#cfd6e2; border-bottom:1px solid #1b2333; }
+  .mrow:last-child { border-bottom:none; }
+  .mrow .mk2 { width:52px; min-width:52px; color:#7f8ba1; font-weight:bold; }
+  .mnote { margin-top:12px; font-size:12.5px; line-height:1.65; color:#aeb8c9; background:#161d2c;
+    border:1px solid #202b40; border-radius:10px; padding:11px 13px; }
+  .mfoot { display:flex; gap:8px; padding:14px 20px 18px; border-top:1px solid #202b40; }
+  .mbtn { flex:1; text-align:center; text-decoration:none; font-size:12.5px; font-weight:bold; padding:10px 6px;
+    border-radius:10px; background:#1b2333; border:1px solid #2c3850; color:#cfd6e2; }
+  .mbtn:hover { background:#26314a; color:#fff; }
+  .mbtn.pri { background:#fff; color:#111; border-color:#fff; }
+  .mbtn.pri:hover { background:#e8ecf2; color:#111; }
+
+  /* 모바일 시트 손잡이 (데스크톱에선 숨김) */
+  .grab { display:none; }
+  @keyframes slideup { from{ transform:translateY(100%); } to{ transform:none; } }
+
+  /* 지도 로드 실패 시 */
+  .nomap { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px; color:#8b96ab; gap:6px; }
+  .nomap .nm-ic { font-size:42px; opacity:.5; }
+  .nomap b { color:#e8ecf2; font-size:15px; }
+  .nomap p { font-size:12.5px; line-height:1.7; }
+  body.nomap-mode .panel { top:auto; height:74vh; }
+  @media (max-width:1px){ body.nomap-mode .panel { height:72vh; height:72dvh; } }
+
+  /* ===================== 모바일 반응형 ===================== */
+  @media (max-width:1px) {
+    html, body { -webkit-text-size-adjust:100%; overscroll-behavior:none; }
+
+    /* --- 상단 바 : 브랜드 + 일차 탭 + 레이어 칩을 하나의 흐름으로 --- */
+    .topbar { display:block; position:fixed; top:0; left:0; right:0; z-index:1200;
+      padding:calc(env(safe-area-inset-top, 0px) + 9px) 0 10px;
+      background:linear-gradient(180deg, rgba(14,20,32,.97) 55%, rgba(14,20,32,.75) 82%, rgba(14,20,32,0));
+      pointer-events:none; }
+    .topbar > * { pointer-events:auto; }
+
+    .brand { position:static; padding:0 12px 7px; font-size:10.5px; line-height:1.3; }
+    .brand b { font-size:13.5px; display:block; }
+    .brand i { display:block; }
+    .brand i::before { content:''; }
+
+    .tabs { position:static; max-width:none; padding:0 12px 7px; gap:6px;
+      flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .tabs::-webkit-scrollbar { display:none; }
+    .tab { flex:0 0 auto; padding:7px 13px; font-size:13px; }
+    .tab small { font-size:9.5px; }
+
+    .layers { position:static; width:auto; background:none; border:none; border-radius:0; padding:0 12px; }
+    .layers h4, .ldiv, .ldays { display:none; }
+    #layerRows { display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    #layerRows::-webkit-scrollbar { display:none; }
+    .lrow { flex:0 0 auto; background:rgba(20,27,41,.96); border:1px solid #2c3850; border-radius:20px;
+      padding:6px 12px 6px 7px; gap:6px; }
+    .lrow.on { border-color:#5b8def; background:rgba(30,44,72,.96); }
+    .lrow.off { opacity:.55; }
+    .lrow .ck { display:none; }
+    .lrow .sw { width:18px; height:18px; min-width:18px; font-size:9.5px; border-width:1.5px; }
+    .lrow .lb { font-size:11.5px; }
+
+    /* --- 하단 시트 --- */
+    .panel { position:fixed; top:auto; left:0; right:0; bottom:0; width:auto; max-width:none;
+      height:54vh; height:54dvh;
+      border-radius:20px 20px 0 0; border-left:none; border-right:none; border-bottom:none;
+      box-shadow:0 -8px 34px rgba(0,0,0,.6); transition:height .25s cubic-bezier(.2,.8,.3,1); }
+    .panel.min { height:118px; }
+    .panel.max { height:88vh; height:88dvh; }
+    .grab { display:flex; align-items:center; justify-content:center; gap:8px;
+      padding:9px 0 7px; flex-shrink:0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .grab span { display:block; width:40px; height:4px; border-radius:3px; background:#3a4a68; }
+    .grab em { font-style:normal; font-size:10.5px; color:#7f8ba1; }
+    .grab:active span { background:#5b8def; }
+
+    .panel-head { padding:2px 15px 0; }
+    .p-day { font-size:11.5px; }
+    .p-title { font-size:16.5px; }
+    .p-sub { font-size:12px; margin-bottom:8px; }
+    .panel.min .p-sub, .panel.min .p-meta, .panel.min .subtabs, .panel.min .panel-scroll { display:none; }
+    .p-meta { margin-bottom:8px; }
+    .chip { font-size:10.5px; }
+    .stab { font-size:12px; padding:11px 2px; }
+    .panel-scroll { padding:14px 15px calc(env(safe-area-inset-bottom, 0px) + 24px); -webkit-overflow-scrolling:touch; }
+
+    .card { padding:12px; gap:12px; }
+    .card .ic { width:44px; height:44px; min-width:44px; }
+    .card .nm { font-size:14.5px; }
+    .route-btn { padding:11px 16px; font-size:13.5px; }
+    .sumgrid { gap:6px; }
+    .sumbox .v { font-size:16px; }
+    .sect { margin:14px 0 7px; }
+
+    /* --- 상세 레이어 : 바텀시트 --- */
+    .modal { padding:0; align-items:flex-end; }
+    .msheet { width:100%; max-width:none; max-height:88vh; border-radius:20px 20px 0 0;
+      border-left:none; border-right:none; border-bottom:none;
+      animation:slideup .24s cubic-bezier(.2,.9,.3,1); }
+    .mhead { padding:16px 15px 13px; }
+    .m-ic { width:48px; height:48px; min-width:48px; font-size:24px; border-radius:13px; }
+    .m-title { font-size:18.5px; }
+    .mclose { width:34px; height:34px; min-width:34px; font-size:15px; }
+    .m-body { padding:15px; }
+    .mds { font-size:13.5px; }
+    .mfoot { padding:12px 13px calc(env(safe-area-inset-bottom, 0px) + 14px); gap:7px; }
+    .mbtn { padding:13px 4px; font-size:11.5px; border-radius:12px; }
+
+    .leaflet-control-zoom { display:none; }
+    .mk-label { font-size:10.5px; padding:1px 6px; }
+    .mk-label.tiny { font-size:9.5px; }
+  }
+
+  /* 화면이 낮을 때(가로 모드 등) 시트를 더 낮게 */
+  @media (max-width:1px) and (max-height:520px) {
+    .panel { height:62vh; }
+    .panel.min { height:104px; }
+    .panel.max { height:92vh; }
+    .brand { display:none; }
+  }
+
+  @media (max-width:1px) {
+    .tab { padding:6px 11px; font-size:12.5px; }
+    .tab small { font-size:9px; }
+    .stab { font-size:10.5px; }
+    .mbtn { font-size:10.5px; padding:12px 3px; }
+    .brand b { font-size:12.5px; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="topbar">
+  <div class="brand"><b>포항 → 속초 4박5일 동해안 드라이브</b><i> 2026.11.2(월)~11.6(금) · 경기 광주 출발/도착 · 총 약 980km</i></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="layers">
+    <h4>지도에 표시</h4>
+    <div id="layerRows"></div>
+    <div class="ldiv"></div>
+    <div class="ldays" id="legendDays"></div>
+  </div>
+</div>
+<div class="panel" id="panelBox">
+  <div class="grab" id="grab"><span></span><em id="grabTxt">탭하면 넓게 보기</em></div>
+  <div class="panel-head">
+    <div class="p-day" id="pday"></div>
+    <div class="p-title" id="ptitle"></div>
+    <div class="p-sub" id="psub"></div>
+    <div class="p-meta" id="pmeta"></div>
+    <div class="subtabs" id="subtabs"></div>
+  </div>
+  <div class="panel-scroll" id="panel"></div>
+</div>
+
+<!-- 상세 정보 레이어 -->
+<div class="modal" id="modal">
+  <div class="msheet">
+    <div class="mhead">
+      <div class="m-ic"></div>
+      <div style="min-width:0">
+        <div class="m-kind"></div>
+        <div class="m-title"></div>
+      </div>
+      <button class="mclose" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="m-body"></div>
+    <div class="mfoot">
+      <a class="mbtn pri m-navi" href="javascript:void(0)">🚘 카카오내비 길안내</a>
+      <a class="mbtn m-nav" target="_blank">네이버 지도</a>
+      <a class="mbtn m-gmap" target="_blank">구글 지도</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================================================================
+   4박5일 동해안 드라이브 · 2026.11.2(월) ~ 11.6(금)
+   09:00 경기 광주 출발 기준 / 11월 초 일몰 약 17:20 반영
+   =================================================================== */
+const DAYS = [
+/* ---------------- 1일차 ---------------- */
+{
+  color:"#5b8def",
+  date:"11/2 (월)",
+  title:"경기 광주 → 문경·상주 → 포항 (강 절경 경유지 2곳)",
+  sub:"09:00 출발. 가는 길에 경북팔경 제1경 진남교반과 낙동강 제1경 경천대를 들르고, 오후 늦게 포항에 들어가 구룡포·호미곶·스페이스워크로 마무리.",
+  meta:["🚗 주행 430km","⏱ 이동 4h40m","🏞 강 절경 2곳"],
+  tip:"💡 두 경유지 모두 <b>걷는 시간이 짧고 고속도로 IC에서 5분</b>이라 이동일에 부담이 없습니다. 진남교반은 3번 국도변, 경천대는 상주IC에서 10분. 스페이스워크는 매월 첫째 월요일 휴무 — <b>11/2가 첫째 월요일</b>이라 휴무 가능성이 큽니다. 054-289-7900 확인 후, 휴무면 영일대 해상누각 야경으로 대체하세요. (호미반도 해안둘레길은 첫날 해가 짧아 뺐습니다. 2일차 아침에 여유가 있으면 들러보세요.)",
+  stops:[
+    {sect:"Morning"},
+    {t:"09:00", name:"경기 광주 출발", ic:"🚗", coord:[37.4292,127.2550], ds:"제2중부 → 중부내륙고속도로. 문경 진남교반까지 약 170km / 1시간 50분.", skip:true},
+    {t:"11:00", name:"진남교반 & 고모산성", ic:"⛰️", badge:"inland", coord:[36.6592,128.1296], ds:"<b>경유지 ①</b> 1933년 선정된 <b>경북팔경 제1경</b>. 영강이 굽이도는 절벽과 3개의 다리가 겹치는 풍경, 그 위로 신라 고모산성이 얹혀 있습니다. 진남휴게소에 차를 대면 전망은 바로, 성벽까지 올라도 40분이면 충분해요. 오미자 철로자전거도 여기서 탑니다."},
+    {sect:"Afternoon"},
+    {t:"12:20", name:"상주 경천대 국민관광지", ic:"🏞️", badge:"inland", coord:[36.4582,128.2440], ds:"<b>경유지 ②</b> <b>낙동강 제1경</b>. 강이 크게 휘도는 물돌이를 절벽 위 전망대에서 내려다보는데, 소나무 숲과 강변 단풍이 11월 초에 가장 예쁩니다. 드라마 '상도' 세트장과 무지개다리도 함께. 전망대까지 데크길 15분, 점심은 상주 시내(차로 10분)에서."},
+    {t:"16:00", name:"구룡포 근대문화역사거리", ic:"🏮", badge:"must", coord:[35.9914,129.5598], ds:"일제강점기 일본인 가옥거리를 복원한 골목. 드라마 '동백꽃 필 무렵' 촬영지. 계단 위 전망대에서 구룡포항이 한눈에. 골목 카페에서 커피 한 잔 하고 이동."},
+    {t:"16:50", name:"호미곶 해맞이광장 · 상생의 손", ic:"🤚", badge:"must", coord:[36.0760,129.5665], ds:"한반도 최동단. 바다 위 오른손(상생의 손)과 광장의 왼손. 17:20 일몰에 맞춰 도착하면 실루엣 사진이 근사합니다. 주차 무료."},
+    {sect:"Evening"},
+    {t:"18:20", name:"영일대해수욕장 & 해상누각 (체크인)", ic:"🌅", coord:[36.0570,129.3785], ds:"숙소 체크인 후 바다 산책. 국내 유일 해상누각 야경 사진. 저녁은 해안로 횟집거리에서 물회 또는 조개구이."},
+    {t:"19:40", name:"환호공원 스페이스워크", ic:"🎢", badge:"night", coord:[36.0663,129.3893], ds:"트랙 333m·계단 717개 강철 조형물. 야간 조명 + 포항 야경 360도. 무료. (매월 첫째 월요일 휴무 — 사전 확인 필수)"}
+  ],
+  photo:[
+    {name:"상주 경천대 전망대", ic:"📸", ds:"절벽 위 전망대에서 낙동강이 크게 휘도는 물돌이를 통째로 담는 컷. 강 건너 백사장과 솔숲, 무지개다리가 한 프레임에 들어옵니다. 오후 빛이 강물에 반짝일 때가 가장 예뻐요.", coord:[36.4582,128.2440], tags:["#경천대","#낙동강물돌이","#상도세트장"]},
+    {name:"호미곶 상생의 손 '손바닥 위 태양'", ic:"📸", ds:"바다 손가락 사이에 해를 올려놓는 각도샷이 시그니처. 광장 왼쪽 낮은 자세에서 촬영. 17:20 일몰 무렵엔 실루엣 컷이 압도적입니다.", coord:[36.0761,129.5670], tags:["#호미곶","#상생의손","#일몰실루엣"]}
+  ],
+  food:[
+    {name:"초곡관", ic:"🥩", ds:"진남교반 바로 옆 문경 돼지고기구이 노포. 경유지 ①에서 이른 점심을 먹고 싶을 때.", ad:"문경시 마성면 진남1길 179", coord:[36.6562,128.1290]},
+    {name:"칠성돈 상주본점", ic:"🍖", ds:"경천대에서 차로 10분, 상주 시내 고기집. 점심 코스로 무난합니다.", ad:"상주시 경상대로 3030", coord:[36.4175,128.1513]},
+    {name:"까꾸네 모리국수", ic:"🍜", ds:"구룡포 원조 모리국수. 아귀·미더덕·해물을 얼큰하게 끓여낸 향토 국수. 2인분부터.", ad:"구룡포읍 호미로 239-13", coord:[35.9914,129.5562]},
+    {name:"묵돌이", ic:"🐟", ds:"영일대 해안로 물회·활어회. 저녁 피크 전 18시 이전 입장 추천.", ad:"포항 북구 해안로 107", coord:[36.0584,129.3785]},
+    {name:"마당집", ic:"🦪", ds:"영일대 조개구이 골목 대표. 바다 보며 먹는 구이 세트.", ad:"포항 북구 해안로 99", coord:[36.0575,129.3780]}
+  ],
+  drone:[
+    {name:"호미곶 해맞이광장", ic:"🚁", ds:"광장·등대·상생의 손을 한 프레임에. 사방이 개활지라 이·착륙 여유. 포항경주공항에서 16km 떨어져 관제권 밖.", coord:[36.0760,129.5665], ok:true, tags:["관제권 밖","개활지","일출 최고"]},
+    {name:"구룡포항 방파제 (전망대 언덕)", ic:"🚁", ds:"활처럼 휜 항구와 어선, 근대거리 지붕을 위에서. 어항 상공은 저고도 유지, 사람 위 비행 금지.", coord:[35.9891,129.5523], ok:true, tags:["항구 부감","저고도 권장"]}
+  ],
+  droneWarn:"⚠️ <b>영일대·환호공원 일대는 포항경주공항 관제권(반경 9.3km) 안</b>입니다. 시내권 비행은 드론원스톱(drone.onestop.go.kr) 사전 승인이 필요해요. 호미곶·구룡포는 관제권 밖이라 신고 없이 가능(단, 250g 초과 기체는 기체신고+조종자준수사항 필수).",
+  stay:[
+    {name:"브라운도트호텔 포항영일대점", ic:"🏨", ds:"영일대해수욕장 바로 앞. 건물 지하·부설 주차장, 오션뷰 객실 지정 예약 가능. 신축급 컨디션.", ad:"포항 북구 해안로 113", coord:[36.0587,129.3787], tags:["부설주차","오션뷰","신축"]},
+    {name:"갤럭시호텔", ic:"🏨", ds:"영일대 해안로 라인. 1층 주차 후 엘리베이터 직행. 전면 객실은 해수욕장 정면뷰.", ad:"포항 북구 해안로 93", coord:[36.0571,129.3778], tags:["1층주차","정면 오션뷰","가성비"]},
+    {name:"H.AVENUE HOTEL 영일대점", ic:"🏨", ds:"영일대 남단, 해상누각·스타벅스 도보권. 자체 주차타워 운영.", ad:"포항 북구 해안로 75-1", coord:[36.0556,129.3772], tags:["주차타워","누각 도보 3분"]}
+  ]
+},
+
+/* ---------------- 2일차 ---------------- */
+{
+  color:"#2ecc9a",
+  date:"11/3 (화)",
+  title:"포항 → 영덕 → 울진 (해안도로 + 단풍 계곡)",
+  sub:"이가리 닻 전망대에서 시작해 강축해안도로·해맞이공원 풍력단지를 지나 후포 스카이워크까지. 오후엔 11월 단풍 절정인 불영계곡을 들러 죽변에서 마무리.",
+  meta:["🚗 주행 190km","⏱ 이동 3h40m","🦀 대게 시즌 개막"],
+  tip:"💡 <b>영덕 대게 금어기가 11/1 해제</b>돼 11월 초는 첫물 대게를 맛보기 딱 좋은 시기입니다. 내연산·불영계곡 단풍도 11월 초가 절정. 불영계곡은 36번 국도 왕복 구간이라 해 지기 전(16:00~17:10)에 통과하세요.",
+  stops:[
+    {sect:"Morning"},
+    {t:"09:00", name:"이가리 닻 전망대", ic:"⚓", badge:"must", coord:[36.1946,129.3866], ds:"바다로 뻗은 닻 모양 전망대, 끝은 독도 방향. 무료 입장·무료 주차. 오전 순광이라 사진이 가장 잘 나오는 시간대."},
+    {t:"09:50", name:"내연산 보경사 & 12폭포 계곡길", ic:"🍁", badge:"inland", coord:[36.2720,129.3250], ds:"이가리에서 내륙으로 20분. 신라 고찰 보경사와 상생폭포~관음폭포 계곡길(왕복 1시간 30분). 11월 초 단풍 절정 구간. 시간이 빠듯하면 상생폭포에서 되돌아오세요."},
+    {sect:"Afternoon"},
+    {t:"11:50", name:"강구항 대게거리 (점심)", ic:"🦀", badge:"food", coord:[36.3592,129.3856], ds:"영덕 대게의 본고장. 대게찜 + 게딱지 볶음밥. 직판장에서 kg당 시세 확인 후 2~3곳 비교하고 들어가세요."},
+    {t:"13:10", name:"강축해안도로 · 창포말등대 · 해맞이공원", ic:"🛣️", badge:"road", road:true, coord:[36.4245,129.4363], ds:"강구항~축산항 20km, 동해안 최고 해안 드라이브. 대게 집게발 모양 창포말등대와 능선 위 풍력발전단지가 하이라이트."},
+    {t:"14:40", name:"후포 등기산 스카이워크 & 갓바위", ic:"🌉", coord:[36.6774,129.4529], ds:"바다 위 유리바닥 전망교(무료). 등기산공원 산책로와 '진짜사나이' 촬영지 갓바위까지 30분이면 충분."},
+    {t:"16:00", name:"불영계곡 단풍 드라이브", ic:"⛰️", badge:"inland", coord:[36.9700,129.3500], ds:"울진 근남에서 36번 국도로 진입. 기암 협곡을 끼고 달리는 단풍 구간 — '한국의 그랜드캐니언'. 불영사 입구 전망대까지 왕복 50분."},
+    {sect:"Evening"},
+    {t:"17:05", name:"망양정 & 망양해안도로", ic:"🏯", badge:"road", road:true, coord:[36.9297,129.4165], ds:"관동팔경 정자에서 동해 조망. 일몰 17:20 직전 도착이라 하늘이 물드는 순간을 정자에서 맞을 수 있어요."},
+    {t:"18:00", name:"죽변항 (저녁)", ic:"🐟", badge:"food", coord:[37.0533,129.4222], ds:"울진 대게·홍게, 곰치국. 식후 죽변항 야경 산책 또는 등대 방향 골목길."}
+  ],
+  photo:[
+    {name:"이가리 닻 전망대", ic:"📸", ds:"바다 위 닻 끝 지점에서 뒤돌아보는 컷, 그리고 데크 아래 해안에서 전망대 전체를 담는 컷 두 가지. 오전 10시 이전이 인파도 적고 순광.", coord:[36.1946,129.3866], tags:["#이가리닻전망대","#독도방향","#오전순광"]},
+    {name:"죽변 드라마세트장 & 하트해변", ic:"📸", ds:"'폭풍속으로' 세트장 하얀 집 + 언덕에서 내려다보는 하트 모양 해변. 죽변 스카이레일 언덕길 끝. 파란 하늘일 때 색감 최고.", coord:[37.0578,129.4278], tags:["#하트해변","#죽변","#드라마세트장"]}
+  ],
+  food:[
+    {name:"사계절대게직판장 영덕본점", ic:"🦀", ds:"강구대게길 대표 직판장. 찜값 별도 확인 후 게딱지 볶음밥까지.", ad:"영덕군 강구면 강구대게길 52", coord:[36.3591,129.3856]},
+    {name:"착한대게 영덕본점", ic:"🦀", ds:"저울 공개·가격 정찰로 알려진 집. 홍게 코스도 가성비 좋아요.", ad:"영덕군 강구면 강구대게길 47", coord:[36.3590,129.3849]},
+    {name:"보움 (오션뷰 카페)", ic:"☕", ds:"영덕대게로 창포리, 통창 너머 동해가 그대로. 해맞이공원 가는 길 커피 타임.", ad:"영덕군 영덕읍 영덕대게로 928", coord:[36.4188,129.4316]},
+    {name:"동해회대게 죽변항 본점", ic:"🐟", ds:"죽변 수협 유통센터 내. 활대게·홍게 즉석 손질 후 2층에서 식사.", ad:"울진군 죽변면 죽변항길 239", coord:[37.0543,129.4237]},
+    {name:"울진대게궁7호", ic:"🍲", ds:"대게·홍게에 곰치국·물곰탕. 저녁 늦게까지 영업하는 편.", ad:"울진군 죽변면 죽변항길 239", coord:[37.0542,129.4234]}
+  ],
+  drone:[
+    {name:"영덕 해맞이공원 · 풍력발전단지", ic:"🚁", ds:"능선의 흰 풍력터빈 + 창포말등대 + 해안 절벽. 동해안 최고 드론 피사체. 단, 풍력터빈 반경 100m 이내 접근 금지, 바람이 강하니 배터리 여유 필수.", coord:[36.4245,129.4363], ok:true, tags:["풍력터빈","강풍주의","개활지"]},
+    {name:"이가리 닻 전망대 상공", ic:"🚁", ds:"바다로 뻗은 닻 구조물을 수직 부감으로. 주차장에서 이륙, 관광객 머리 위 비행은 피하세요.", coord:[36.1946,129.3866], ok:true, tags:["수직부감","저고도"]}
+  ],
+  droneWarn:"⚠️ <b>죽변 북쪽은 한울원자력본부 반경 3.6km 비행금지구역</b>입니다. 죽변항에서 북쪽으로 4~5km부터 걸리니 죽변 일대 비행은 피하고 이가리·해맞이공원에서 촬영하세요. 동해안 해안선 전체가 군 경계지역이라 해안초소 방향 촬영은 자제하는 게 안전합니다.",
+  stay:[
+    {name:"쏠 모텔", ic:"🏨", ds:"죽변항길 정면. 항구 바로 앞 노상+부설 주차, 전면 객실 항구뷰. 다음날 스카이레일 도보 5분.", ad:"울진군 죽변면 죽변항길 109", coord:[37.0583,129.4238], tags:["항구 정면","주차 여유","스카이레일 도보"]},
+    {name:"모텔쿡", ic:"🏨", ds:"죽변중앙로, 건물 1층 필로티 주차. 객실 컨디션이 죽변에서 무난한 편.", ad:"울진군 죽변면 죽변중앙로 160-21", coord:[37.0590,129.4216], tags:["필로티 주차","깔끔"]},
+    {name:"피렌체고궁", ic:"🏨", ds:"죽변 시내 쪽. 객실 앞 주차 가능한 드라이브인 구조, 방이 넓습니다. 바다는 도보 8분.", ad:"울진군 죽변면 죽변중앙로 235-8", coord:[37.0557,129.4280], tags:["객실앞 주차","넓은 객실"]}
+  ]
+},
+
+/* ---------------- 3일차 ---------------- */
+{
+  color:"#f39c3d",
+  date:"11/4 (수)",
+  title:"울진 → 삼척 → 동해 → 강릉 (가장 알찬 날)",
+  sub:"바다 위 레일과 2026년 신상 해상 스카이워크, 추암 촛대바위, 단풍 무릉계곡, 그리고 바다에 가장 가까운 길 헌화로까지.",
+  meta:["🚗 주행 200km","⏱ 이동 3h50m","⭐ 하이라이트 데이"],
+  tip:"💡 스카이레일·스카이워크는 강풍 시 운휴 — 당일 아침 확인(죽변 스카이레일 054-782-5001 / 삼척해상스카이워크 09:00~18:00). 무릉계곡 베틀바위 전망대는 왕복 2시간이라 오늘 일정엔 무리, 무릉반석·삼화사만 1시간 코스로 도세요.",
+  stops:[
+    {sect:"Morning"},
+    {t:"09:00", name:"죽변 해안스카이레일", ic:"🚝", coord:[37.0580,129.4260], ds:"바다 위를 달리는 무인 모노레일 2.8km. 하트해변·드라마세트장 조망. 왕복 1시간."},
+    {t:"11:30", name:"삼척 장호항 (점심)", ic:"🛶", badge:"must", coord:[37.2867,129.3196], ds:"'한국의 나폴리'. 삼척해상케이블카(장호~용화, 왕복 25분) 탑승 후 항구 식당가에서 점심."},
+    {sect:"Afternoon"},
+    {t:"13:00", name:"새천년해안도로 (이사부길)", ic:"🛣️", badge:"road", road:true, coord:[37.4400,129.1900], ds:"삼척해변~삼척항 4.6km 해안 절벽 드라이브. 비치조각공원과 기암 사이를 달리는 길."},
+    {t:"13:40", name:"삼척 해상 스카이워크", ic:"🌁", badge:"new", coord:[37.4467,129.1811], ds:"2026년 3월 정식 개장. 길이 100m·해발 77m 절벽 위 돛단배 형상 전망교, 바닥 일부 투명 유리. 소망의탑 맞은편 무료주차장. 운영 09:00~18:00."},
+    {t:"14:40", name:"추암 촛대바위 & 출렁다리", ic:"🪨", badge:"must", coord:[37.4756,129.1610], ds:"애국가 일출 배경 기암. 출렁다리 건너 조각공원까지 40분 코스."},
+    {t:"15:40", name:"무릉계곡 & 삼화사", ic:"🍁", badge:"inland", coord:[37.4555,129.0100], ds:"두타산 자락 '동해안 소금강'. 1,000명이 앉는다는 무릉반석과 삼화사까지 가볍게 1시간. 11월 초 단풍 절정. 입장료 2,000원."},
+    {sect:"Evening"},
+    {t:"16:50", name:"헌화로 해안 드라이브 (금진~심곡~정동진)", ic:"🛣️", badge:"road", road:true, coord:[37.6595,129.0509], ds:"바다와 도로 높이가 거의 같은, 국내에서 바다에 가장 가까운 길. 일몰 17:20 직전 통과가 베스트."},
+    {t:"18:10", name:"강릉 초당순두부마을 (저녁)", ic:"🍛", badge:"food", coord:[37.7899,128.9166], ds:"짬뽕순두부 원조 동네. 식후 경포호 야간 산책 또는 안목해변 야경."}
+  ],
+  photo:[
+    {name:"삼척 해상 스카이워크 유리바닥", ic:"📸", ds:"해발 77m 투명 데크 위에서 발밑 바다를 담는 컷. 돛단배 형상 구조물 전체를 넣으려면 소망의탑 쪽에서 원경으로. 2026년 개장 첫해라 SNS 신상 스팟.", coord:[37.4467,129.1811], tags:["#삼척해상스카이워크","#유리바닥","#2026신상"]},
+    {name:"헌화로 심곡~금진 구간", ic:"📸", ds:"차를 갓길에 세우고 바다와 도로가 같은 높이인 앵글로. 심곡항 방파제 쪽 커브가 가장 유명한 자리. 일몰 30분 전 골든아워 추천.", coord:[37.6520,129.0470], tags:["#헌화로","#바다드라이브","#골든아워"]}
+  ],
+  food:[
+    {name:"장호항 영기횟집", ic:"🐟", ds:"장호항 수산물유통센터 1층. 자연산 모둠회와 물회, 성게비빔밥.", ad:"삼척시 근덕면 장호길 99", coord:[37.2868,129.3162]},
+    {name:"투썸플레이스 삼척장호항점", ic:"☕", ds:"장호항 정면 오션뷰 카페. 케이블카 대기 시간 보내기 좋아요.", ad:"삼척시 근덕면 장호항길 76", coord:[37.2866,129.3180]},
+    {name:"청해수산", ic:"🦑", ds:"묵호항 일출로. 오징어회·물회로 알려진 현지 집. 추암에서 10분.", ad:"동해시 일출로 103", coord:[37.5524,129.1188]},
+    {name:"강릉짬뽕순두부 동화가든 본점", ic:"🍛", ds:"짬뽕순두부의 원조. 대기 있을 땐 앱 예약 먼저.", ad:"강릉시 초당순두부길77번길 15", coord:[37.7911,128.9146]},
+    {name:"소나무집 초당순두부", ic:"🥣", ds:"담백한 초당식 순두부 정식. 붐비지 않는 편이라 대기 부담이 적어요.", ad:"강릉시 초당순두부길 95-5", coord:[37.7916,128.9154]}
+  ],
+  drone:[
+    {name:"추암 촛대바위 · 출렁다리", ic:"🚁", ds:"바다에서 솟은 촛대바위 군락을 측면 저고도로 감아 도는 샷. 조각공원 잔디밭에서 이륙하기 좋고, 아침 일출 컷이 압도적입니다.", coord:[37.4756,129.1610], ok:true, tags:["기암 군락","일출 최고","이륙 여유"]},
+    {name:"헌화로 금진~심곡 절벽 구간", ic:"🚁", ds:"해안 절벽을 따라 이어진 도로를 위에서 따라가는 트래킹 샷. 금진항 주차장에서 이륙, 도로 위 차량 직상공 비행은 피하세요.", coord:[37.6520,129.0470], ok:true, tags:["도로 트래킹샷","차량 직상공 금지"]}
+  ],
+  droneWarn:"⚠️ 삼척·동해 해안은 군 경계지역이라 해안초소·군 시설 방향 촬영은 자제하세요. <b>무릉계곡은 국립공원이 아닌 도립공원이지만 관리사무소 사전 협의</b>가 필요합니다. 250g 초과 기체는 반드시 사전 기체신고 후 비행하세요.",
+  stay:[
+    {name:"씨웰빙하우스", ic:"🏨", ds:"안목해변 백사장 라인. 건물 앞 자체 주차, 전면 객실 정면 오션뷰. 커피거리 도보 3분이라 다음날 아침이 편해요.", ad:"강릉시 창해로14번길 40-4", coord:[37.7712,128.9487], tags:["정면 오션뷰","커피거리 도보","자체주차"]},
+    {name:"엘마르 모텔", ic:"🏨", ds:"안목해변 창해로 초입. 1층 필로티 주차 후 바로 객실 접근. 가성비 좋은 오션뷰.", ad:"강릉시 창해로 23", coord:[37.7739,128.9443], tags:["필로티 주차","오션뷰","가성비"]},
+    {name:"인터파크 (모텔)", ic:"🏨", ds:"안목·강문 사이 창해로. 주차 공간 넉넉하고 방이 넓은 편. 경포·초당 이동도 10분 내.", ad:"강릉시 창해로 21", coord:[37.7738,128.9444], tags:["주차 넉넉","넓은 객실"]}
+  ]
+},
+
+/* ---------------- 4일차 ---------------- */
+{
+  color:"#b57bee",
+  date:"11/5 (목)",
+  title:"강릉 → 양양 → 속초 (여유로운 해안 70km)",
+  sub:"모닝커피와 오죽헌, 도깨비 방파제와 서핑 해변, 절벽 위 낙산사를 지나 속초 중앙시장 먹방으로 마무리.",
+  meta:["🚗 주행 90km","⏱ 이동 2h10m","🍂 가장 여유로운 날"],
+  tip:"💡 오늘은 이동이 짧아 여유가 많습니다. 아침에 부지런하면 강릉 내륙 <b>안반데기</b>(왕복 1시간 30분, 구름 위 배추밭)를 추가해도 좋아요. 11월 초 낙산사 의상대 일몰은 17:20경 — 16:40까지 도착하면 노을을 볼 수 있습니다.",
+  stops:[
+    {sect:"Morning"},
+    {t:"09:00", name:"안목해변 커피거리", ic:"☕", badge:"must", coord:[37.7716,128.9470], ds:"동해를 보며 마시는 모닝커피 — 강릉 필수 경험. 파도 소리와 브런치로 하루 시작."},
+    {t:"10:15", name:"오죽헌 & 경포대", ic:"📜", badge:"inland", coord:[37.7790,128.8780], ds:"신사임당·율곡 이이의 오죽헌과 관동팔경 경포대. 강릉의 내륙 역사 코스 1시간."},
+    {t:"11:45", name:"주문진 영진해변 방파제 (점심)", ic:"🧣", badge:"food", coord:[37.8798,128.8290], ds:"'도깨비' 촬영지 방파제에서 사진 후 주문진수산시장에서 회·대게 점심."},
+    {sect:"Afternoon"},
+    {t:"13:30", name:"동해대로 해안 드라이브 (주문진~남애항)", ic:"🛣️", badge:"road", road:true, coord:[37.9500,128.7800], ds:"남애항·죽도 등 작은 항구가 이어지는 구간. 남애항 전망대에서 잠깐 정차 추천."},
+    {t:"14:20", name:"하조대 전망대 & 스카이워크", ic:"🌊", coord:[38.0221,128.7266], ds:"애국가 일출 절벽 정자 + 투명 바닥 스카이워크. 하조대 등대까지 도보 10분."},
+    {t:"15:20", name:"서피비치 & 죽도해변", ic:"🏄", coord:[38.0462,128.7113], ds:"야자수와 비치베드가 늘어선 이국적 서핑 해변. 11월엔 한산해서 사진 찍기 최적."},
+    {t:"16:40", name:"낙산사 (의상대 노을)", ic:"🛕", badge:"must", coord:[38.1249,128.6301], ds:"바다 절벽 위 사찰. 의상대·홍련암 전망은 동해안 사찰 풍경의 정점. 무료 주차."},
+    {sect:"Evening"},
+    {t:"18:00", name:"속초 중앙시장 (저녁)", ic:"🍗", badge:"food", coord:[38.2071,128.5919], ds:"닭강정·오징어순대·아바이순대·씨앗호떡. 식후 아바이마을 갯배 또는 등대전망대 야경."}
+  ],
+  photo:[
+    {name:"주문진 영진해변 방파제 (도깨비 촬영지)", ic:"📸", ds:"국내 최고 인기 포토존. 방파제 계단에 서서 빨간 목도리 들고 찍는 컷이 정석. 소품 대여소가 현장에 있고, 오전이 역광을 피할 수 있어요.", coord:[37.8798,128.8290], tags:["#도깨비촬영지","#영진해변","#빨간목도리"]},
+    {name:"서피비치 (양양)", ic:"📸", ds:"야자수·비치체어·서프보드가 늘어선 발리 느낌 해변. 'SURFYY BEACH' 사인과 라운지 데크가 대표 컷. 11월엔 사람이 적어 깔끔한 사진이 나옵니다.", coord:[38.0462,128.7113], tags:["#서피비치","#양양","#이국적"]}
+  ],
+  food:[
+    {name:"대동면옥", ic:"🍜", ds:"주문진 막국수 노포. 물·비빔 막국수에 수육 조합.", ad:"강릉시 주문진읍 연주로 438", coord:[37.8912,128.8247]},
+    {name:"해동대게", ic:"🦀", ds:"주문진 해안로 대게 전문. 활대게 즉석 손질 후 찜.", ad:"강릉시 주문진읍 해안로 1775-1", coord:[37.8935,128.8293]},
+    {name:"해옫 강릉", ic:"🥞", ds:"주문진 브런치 카페. 바다 보며 늦은 아침 먹기 좋은 곳.", ad:"강릉시 주문진읍 주문로 102", coord:[37.8928,128.8270]},
+    {name:"만석닭강정 중앙시장점", ic:"🍗", ds:"속초 닭강정 원조 라인. 대기 길면 포장 후 숙소에서.", ad:"속초시 중앙로147번길 16", coord:[38.2047,128.5902]},
+    {name:"황부자튀김", ic:"🍤", ds:"속초관광수산시장 튀김 골목 인기집. 오징어순대·새우튀김.", ad:"속초시 중앙로147번길 16 (26·27호)", coord:[38.2047,128.5898]}
+  ],
+  drone:[
+    {name:"주문진 소돌 아들바위공원 · 영진해변", ic:"🚁", ds:"기암과 방파제, 어항을 함께 담기 좋은 곳. 양양공항 관제권에서 20km 이상 떨어져 있어 부담이 적습니다.", coord:[37.9030,128.8290], ok:true, tags:["관제권 밖","기암 해안"]},
+    {name:"남애항 전망대", ic:"🚁", ds:"'강원 3대 미항'. 방파제 안에 오밀조밀 들어찬 어선을 수직 부감으로 담으면 그림이 됩니다. 전망대 주차장에서 이륙.", coord:[37.9500,128.7800], ok:true, tags:["3대 미항","수직부감"]}
+  ],
+  droneWarn:"⚠️ <b>하조대·죽도해변·서피비치·낙산사는 모두 양양국제공항 관제권(반경 9.3km) 안</b>입니다. 이 구간은 드론원스톱 사전 승인 없이 띄우면 안 돼요. 오늘 드론은 관제권 밖인 주문진·남애항 구간에서 촬영하시고, 속초 이북은 군사 접경지역이라 별도 승인이 필요합니다.",
+  stay:[
+    {name:"도글리아호텔", ic:"🏨", ds:"속초해수욕장 해오름로 라인. 부설 주차장 넉넉하고 전면 객실 오션뷰. 설악산·중앙시장 모두 15분 내.", ad:"속초시 해오름로 200", coord:[38.1906,128.6009], tags:["오션뷰","부설주차","설악 접근 좋음"]},
+    {name:"속초 굿모닝 호텔", ic:"🏨", ds:"속초해변 바로 앞. 건물 앞·옆 주차, 바다 정면 객실 지정 가능. 가성비 좋은 편.", ad:"속초시 해오름로 204", coord:[38.1905,128.6003], tags:["해변 정면","주차 편의","가성비"]},
+    {name:"모옌 호텔", ic:"🏨", ds:"청초호반로, 청초호 야경뷰. 지하 주차장 완비하고 객실이 신축급. 바다는 차로 5분.", ad:"속초시 청초호반로 52", coord:[38.1903,128.5892], tags:["지하주차","호수뷰","신축급"]}
+  ]
+},
+
+/* ---------------- 5일차 ---------------- */
+{
+  color:"#e8734a",
+  date:"11/6 (금)",
+  title:"설악산 찍고 경기 광주 귀가",
+  sub:"오전 설악산 케이블카로 권금성 파노라마, 미시령 옛길에서 울산바위 정면 샷, 학사평 순두부로 마무리하고 서울양양고속도로로 귀가.",
+  meta:["🚗 주행 260km","⏱ 이동 2h50m","🏁 총 950km 완주"],
+  tip:"💡 설악산 케이블카는 <b>당일 현장 발권만 가능</b>하고 성수기엔 매표 대기가 깁니다. 08:30 도착 목표로 움직이세요. 11월 초 설악은 저지대(소공원~신흥사) 단풍이 절정입니다. 귀가 전 만석닭강정 포장은 국민 코스.",
+  stops:[
+    {sect:"Morning"},
+    {t:"08:30", name:"설악산 케이블카 & 권금성", ic:"🚡", badge:"inland", coord:[38.1735,128.4870], ds:"소공원에서 케이블카 5분, 권금성 화강암 봉우리 360도 파노라마 + 신흥사·통일대불 산책. 왕복 2시간 30분."},
+    {t:"11:20", name:"미시령 옛길 전망대", ic:"⛰️", badge:"must", coord:[38.2166,128.4258], ds:"울산바위를 정면에서 마주하는 최고의 전망대. 맑은 날엔 속초 시내와 동해까지 한눈에. 주차 무료."},
+    {sect:"Afternoon"},
+    {t:"12:30", name:"학사평 콩꽃마을 (점심)", ic:"🥘", badge:"food", coord:[38.2068,128.5232], ds:"속초 순두부 마을에서 마지막 식사. 두부전골·순두부백반으로 든든하게."},
+    {t:"13:40", name:"서울양양고속도로 귀가", ic:"🛣️", coord:[37.8420,127.9800], ds:"양양JC → 인제·홍천 → 가평휴게소 휴식 → 경기 광주.", skip:true},
+    {t:"16:30", name:"경기 광주 도착", ic:"🏡", coord:[37.4292,127.2550], ds:"4박5일 동해안 드라이브 완주! 총 주행 약 950km."}
+  ],
+  photo:[
+    {name:"권금성 정상 바위", ic:"📸", ds:"케이블카 상부역에서 5분 오르면 나오는 노출 암반. 설악 능선을 배경으로 서 있는 실루엣 컷이 시그니처. 난간 없는 구간이라 발밑 조심하세요.", coord:[38.1735,128.4870], tags:["#권금성","#설악산","#암반인생샷"]},
+    {name:"미시령 옛길 전망대 울산바위 뷰", ic:"📸", ds:"울산바위 여섯 봉우리를 정면으로 담는 유일한 도로 전망대. 오전 중 빛이 정면에서 들어와 바위 결이 선명하게 나옵니다.", coord:[38.2166,128.4258], tags:["#미시령옛길","#울산바위","#정면뷰"]}
+  ],
+  food:[
+    {name:"학사평콩꽃마을 순두부촌", ic:"🥣", ds:"속초 순두부 원조 마을. 골목 전체가 순두부집이라 대기 짧은 곳으로 들어가면 됩니다.", ad:"속초시 노학동 1325-20 일대", coord:[38.2068,128.5232]},
+    {name:"옥미정", ic:"🍲", ds:"학사평 순두부촌 안쪽. 두부전골과 손두부 정식이 든든해요.", ad:"속초시 원암학사평길 195", coord:[38.2054,128.5291]},
+    {name:"점봉산산채", ic:"🌿", ds:"설악 IC 방향 산채정식. 나물 위주로 가볍게 먹고 싶을 때.", ad:"속초시 이목로 132", coord:[38.1994,128.5500]},
+    {name:"만석닭강정 (포장)", ic:"🍗", ds:"귀갓길 간식으로 필수. 중앙시장점 또는 고속도로 진입 전 지점에서 포장.", ad:"속초시 중앙로147번길 16", coord:[38.2047,128.5902]},
+    {name:"온천뜰", ic:"🍚", ds:"척산온천 인근 한정식. 설악에서 고속도로 진입 동선상 들르기 좋습니다.", ad:"속초시 온천로 6", coord:[38.1891,128.5431]}
+  ],
+  drone:[
+    {name:"속초해변 · 영금정 (이른 아침)", ic:"🚁", ds:"출발 전 06:30~07:30 일출 타임에. 영금정 정자와 방파제, 동명항을 함께 담는 컷이 좋습니다. 숙소에서 5~10분.", coord:[38.2115,128.5980], ok:true, tags:["일출","숙소 근처","사전신고 권장"]},
+    {name:"영랑호 (호수 부감)", ic:"🚁", ds:"호수 위 부교와 범바위, 뒤로 울산바위가 겹치는 구도. 해변보다 군 통제 부담이 적어 안전한 대안입니다.", coord:[38.2143,128.5745], ok:true, tags:["호수+울산바위","해변보다 안전"]}
+  ],
+  droneWarn:"🚫 <b>설악산국립공원 전역은 드론 비행 금지</b>입니다(권금성·미시령 옛길 포함, 자연공원법). 위반 시 과태료 대상이니 절대 띄우지 마세요. 또한 <b>속초·고성은 휴전선 인근 군사 접경지역</b>이라 해안 비행은 사전 승인이 필요합니다. 오늘은 드론을 접어두고 눈으로만 담는 걸 권합니다.",
+  stay:[]
+}];
+
+/* ===================================================================
+   카카오내비 연동 (선택)
+   ↓ 아래 따옴표 안에 카카오 JavaScript 키를 넣으면 '카카오내비' 버튼이
+     휴대폰의 카카오내비 앱을 목적지까지 바로 실행합니다.
+     발급: developers.kakao.com → 내 애플리케이션 → 앱 키 → JavaScript 키
+           (플랫폼 > Web 에 이 파일을 여는 주소 등록. 로컬 파일이면 비워두세요)
+     비워두면 URL 스킴으로 실행을 시도하고, 실패 시 카카오맵 웹으로 넘어갑니다.
+   =================================================================== */
+const KAKAO_JS_KEY = "";
+
+/* ===================================================================
+   동해안 해안선 경로 (남→북) — 코스 간 이동선을 해안도로 모양으로 그리기
+   =================================================================== */
+const COAST = [
+ [35.9910,129.5560],[36.0180,129.5730],[36.0560,129.5760],[36.0760,129.5665],
+ [36.0870,129.5300],[36.0700,129.4950],[36.0450,129.4600],[36.0330,129.4230],
+ [36.0290,129.3930],[36.0400,129.3720],[36.0570,129.3785],[36.0900,129.4000],
+ [36.1500,129.3950],[36.1946,129.3866],[36.2400,129.3760],[36.3000,129.3800],
+ [36.3592,129.3856],[36.3900,129.4180],[36.4245,129.4363],[36.4600,129.4470],
+ [36.5200,129.4400],[36.5800,129.4300],[36.6300,129.4400],[36.6774,129.4529],
+ [36.7600,129.4700],[36.8200,129.4600],[36.8800,129.4400],[36.9297,129.4165],
+ [36.9900,129.4000],[37.0533,129.4222],[37.1200,129.3900],[37.1900,129.3600],
+ [37.2500,129.3400],[37.2867,129.3196],[37.3400,129.2800],[37.4000,129.2400],
+ [37.4400,129.1900],[37.4467,129.1811],[37.4756,129.1610],[37.5100,129.1400],
+ [37.5524,129.1188],[37.6000,129.0900],[37.6300,129.0700],[37.6595,129.0509],
+ [37.6900,129.0400],[37.7400,128.9800],[37.7716,128.9470],[37.7950,128.9200],
+ [37.8300,128.8900],[37.8798,128.8290],[37.9030,128.8290],[37.9500,128.7800],
+ [37.9900,128.7600],[38.0221,128.7266],[38.0462,128.7113],[38.0800,128.6700],
+ [38.1249,128.6301],[38.1600,128.6050],[38.1906,128.6009],[38.2071,128.5919],
+ [38.2115,128.5980]
+];
+const km = (a,b) => Math.hypot((a[0]-b[0])*111, (a[1]-b[1])*88.5);
+function nearCoast(pt){                       // 해안선에서 가장 가까운 인덱스·거리
+  let bi=-1, bd=1e9;
+  COAST.forEach((c,i)=>{ const d=km(c,pt); if(d<bd){bd=d;bi=i;} });
+  return {i:bi, d:bd};
+}
+/* 두 지점 사이를 해안도로 모양으로 잇는 좌표 배열 */
+function coastalPath(a, b){
+  const A = nearCoast(a), B = nearCoast(b);
+  const TH = 5;                               // 해안에서 5km 이내여야 해안선 스냅(내륙 명소는 직선)
+  if(A.d > TH || B.d > TH || A.i === B.i) return [a, b];
+  const step = A.i < B.i ? 1 : -1;
+  const mid = [];
+  for(let i = A.i + step; i !== B.i + step; i += step) mid.push(COAST[i]);
+  return [a, ...mid, b];
+}
+/* 하루치 코스를 해안 우선 경로로 변환 (출발 지점 포함) */
+function routeLine(day){
+  const pts = day.stops.filter(s=>!s.sect).map(s=>s.coord);
+  let out = [pts[0]];
+  for(let i=1;i<pts.length;i++) out = out.concat(coastalPath(pts[i-1], pts[i]).slice(1));
+  return out;
+}
+
+/* ================= 지도 (오프라인이면 목록 전용 모드) ================= */
+const HAS_MAP = (typeof L !== 'undefined' && L && typeof L.map === 'function');
+let map, layerGroup;
+if(HAS_MAP){
+  map = L.map('map', { zoomControl:true, tap:true }).setView([37.4,129.0], 8);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom:19, attribution:'&copy; OpenStreetMap &copy; CARTO'
+  }).addTo(map);
+  layerGroup = L.layerGroup().addTo(map);
+} else {
+  // 지도 라이브러리를 못 불러온 경우 — 일정표는 그대로 볼 수 있게
+  document.getElementById('map').innerHTML =
+    '<div class="nomap"><div class="nm-ic">🗺</div>' +
+    '<b>지도를 불러오지 못했어요</b>' +
+    '<p>네트워크가 연결되면 지도가 표시됩니다.<br>인터넷 없이도 아래 <b>일정·맛집·숙박 정보는 그대로</b> 보실 수 있어요.</p></div>';
+  document.body.classList.add('nomap-mode');
+  const noop = function(){ return this; };
+  map = { on:noop, off:noop, flyTo:noop, fitBounds:noop, invalidateSize:noop, setView:noop, addLayer:noop, removeLayer:noop };
+  layerGroup = { clearLayers:noop, addTo:noop };
+}
+
+const CAT = {
+  course:{ label:'코스',   color:'#5b8def', icon:'📍' },
+  photo :{ label:'포토존', color:'#f19bff', icon:'📸' },
+  food  :{ label:'맛집',   color:'#ffd166', icon:'🍽' },
+  drone :{ label:'드론',   color:'#5fe0c0', icon:'🚁' },
+  stay  :{ label:'숙박',   color:'#ff8fa3', icon:'🏨' }
+};
+/* 지도 레이어 on/off (기본: 포토존·드론·숙박 켜짐) */
+const SHOW = { photo:true, food:false, drone:true, stay:true };
+
+let curDay = 0;              // -1 = 전체 경로 보기
+let curCat = 'course';
+
+function courseStops(day){ return day.stops.filter(s=>!s.sect && !s.skip); }
+function gmapsLink(day){
+  return 'https://www.google.com/maps/dir/' + courseStops(day).map(s=>s.coord[0]+','+s.coord[1]).join('/');
+}
+function gmapsAll(){
+  const pts = [];
+  DAYS.forEach(d=>courseStops(d).forEach(s=>pts.push(s)));
+  // 구글맵 경유지 제한(약 10개) — 일차별 대표 지점만 추림
+  const key = [pts[0], ...DAYS.map(d=>{const c=courseStops(d); return c[Math.floor(c.length/2)];}), pts[pts.length-1]];
+  return 'https://www.google.com/maps/dir/' + key.map(s=>s.coord[0]+','+s.coord[1]).join('/');
+}
+function naverSearch(name){ return 'https://map.naver.com/p/search/' + encodeURIComponent(name); }
+
+function pinIcon(cat, small){
+  const c = CAT[cat];
+  return L.divIcon({ className:'',
+    html:`<div class="pin${small?' sm':''}" style="background:${c.color}"><b>${c.icon}</b></div>`,
+    iconSize: small?[22,22]:[27,27], iconAnchor: small?[11,22]:[13,27] });
+}
+
+/* POI(포토존·맛집·드론·숙박) 아이콘을 지도에 뿌리기 */
+function addPois(day, dayIdx, small){
+  const out = [];
+  ['photo','food','drone','stay'].forEach(cat=>{
+    if(!SHOW[cat]) return;
+    (day[cat]||[]).forEach((p,idx)=>{
+      const m = L.marker(p.coord, {icon:pinIcon(cat, small), zIndexOffset: cat===curCat?600:200}).addTo(layerGroup);
+      m.bindTooltip(`${CAT[cat].icon} ${p.name}`, {direction:'top', offset:[0,-24],
+        className:'mk-label tiny', permanent: (!small && cat===curCat)});
+      m.on('click', ()=>{
+        if(curDay !== dayIdx || curCat !== cat){ curDay = dayIdx; curCat = cat; render(); }
+        setTimeout(()=>{ focusCard(idx); openDetail(cat, dayIdx, idx); }, 60);
+      });
+      out.push(p.coord);
+    });
+  });
+  return out;
+}
+
+/* ---- 마커 그리기 ---- */
+function drawMarkers(){
+  if(!HAS_MAP) return;
+  layerGroup.clearLayers();
+
+  /* ===== 전체 경로 보기 ===== */
+  if(curDay === -1){
+    const all = [];
+    DAYS.forEach((day,di)=>{
+      const cs = courseStops(day);
+      L.polyline(routeLine(day), { color:day.color, weight:4, opacity:.9, lineJoin:'round' }).addTo(layerGroup);
+      cs.forEach((s,idx)=>{
+        const first = idx===0, last = idx===cs.length-1;
+        const icon = L.divIcon({ className:'',
+          html:`<div class="mk${first||last?'':' dot'}" style="background:${day.color}">${first||last?(di+1):''}</div>`,
+          iconSize:(first||last)?[28,28]:[13,13], iconAnchor:(first||last)?[14,14]:[6,6] });
+        const m = L.marker(s.coord, {icon, zIndexOffset:(first||last)?500:100}).addTo(layerGroup);
+        m.bindTooltip(`${di+1}일차 · ${s.name}`, {direction:'top', offset:[0,-14], className:'mk-label tiny'});
+        m.on('click', ()=>{ curDay = di; curCat='course'; render(); });
+      });
+      routeLine(day).forEach(c=>all.push(c));
+      addPois(day, di, true).forEach(c=>all.push(c));
+    });
+    fit(all);
+    return;
+  }
+
+  /* ===== 일차별 보기 ===== */
+  const day = DAYS[curDay];
+  const cs = courseStops(day);
+  L.polyline(routeLine(day), { color:day.color, weight:3.5, opacity: curCat==='course'?.9:.4, lineJoin:'round' }).addTo(layerGroup);
+
+  // 출발지 등 번호 없는 지점(고속도로 경유 표시)도 작은 표식으로
+  day.stops.filter(s=>!s.sect && s.skip).forEach(s=>{
+    const icon = L.divIcon({ className:'',
+      html:`<div class="mk dot" style="background:#0e1420;border-color:${day.color}"></div>`, iconSize:[13,13], iconAnchor:[6,6] });
+    L.marker(s.coord, {icon}).addTo(layerGroup)
+      .bindTooltip(`${s.t} ${s.name}`, {direction:'top', offset:[0,-9], className:'mk-label tiny'});
+  });
+
+  cs.forEach((s,idx)=>{
+    const isC = curCat === 'course';
+    const inl = s.badge==='inland' ? ' inland-mk' : '';
+    const icon = L.divIcon({ className:'',
+      html:`<div class="mk${inl}${isC?'':' dot'}" style="background:${day.color};${isC?'':'opacity:.55'}">${isC?(idx+1):''}</div>`,
+      iconSize:isC?[28,28]:[13,13], iconAnchor:isC?[14,14]:[6,6] });
+    const m = L.marker(s.coord, {icon, zIndexOffset:isC?500:100}).addTo(layerGroup);
+    m.bindTooltip(`${idx+1}. ${s.name}`, {permanent:isC, direction:'top', offset:[0,isC?-15:-9], className:isC?'mk-label':'mk-label tiny'});
+    m.on('click', ()=>{
+      if(curCat!=='course'){ curCat='course'; render(); }
+      setTimeout(()=>{ focusCard(idx); openDetail('course', curDay, idx); }, 60);
+    });
+  });
+
+  const poi = addPois(day, curDay, false);
+  fit(routeLine(day).concat(poi));
+}
+/* 패널을 피해서 지도를 맞춤 (모바일 = 아래쪽, 데스크톱 = 오른쪽) */
+function fit(coords){
+  if(!HAS_MAP || !coords.length) return;
+  const b = L.latLngBounds(coords);
+  const mob = window.innerWidth <= 900;
+  let opt;
+  if(mob){
+    const top = (document.querySelector('.topbar')||{}).offsetHeight || 130;
+    const bot = (document.getElementById('panelBox')||{}).offsetHeight || 300;
+    opt = { paddingTopLeft:[22, top + 14], paddingBottomRight:[22, bot + 14] };
+  } else {
+    opt = { paddingTopLeft:[40, 120], paddingBottomRight:[460, 40] };
+  }
+  try{ map.fitBounds(b, opt); }catch(e){ try{ map.fitBounds(b); }catch(e2){} }
+}
+function focusCard(idx){
+  const el = document.getElementById('card-'+idx);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('hl'));
+  el.classList.add('hl');
+}
+
+/* ---- 패널 그리기 ---- */
+const BADGES = {
+  must:'<span class="badge b-must">필수</span>', food:'<span class="badge b-food">맛집</span>',
+  inland:'<span class="badge b-inland">내륙 명소</span>', night:'<span class="badge b-night">야경</span>',
+  road:'<span class="badge b-road">해안도로</span>', new:'<span class="badge b-new">2026 신상</span>'
+};
+
+/* ---- 전체 경로 패널 ---- */
+function renderOverview(){
+  const n = k => DAYS.reduce((a,d)=>a+(d[k]||[]).length, 0);
+  let html = `<a class="route-btn" href="${gmapsAll()}" target="_blank">➤&nbsp;구글맵으로 전체 여정 열기</a>
+  <div class="sumgrid">
+    <div class="sumbox"><div class="v" style="color:#f19bff">${n('photo')}</div><div class="k">📸 포토존</div></div>
+    <div class="sumbox"><div class="v" style="color:#ffd166">${n('food')}</div><div class="k">🍽 맛집</div></div>
+    <div class="sumbox"><div class="v" style="color:#5fe0c0">${n('drone')}</div><div class="k">🚁 드론</div></div>
+    <div class="sumbox"><div class="v" style="color:#ff8fa3">${n('stay')}</div><div class="k">🏨 숙박</div></div>
+  </div>
+  <div class="sect">일차별 요약 · 클릭하면 상세로 이동</div>`;
+
+  DAYS.forEach((d,i)=>{
+    const cs = courseStops(d);
+    const head = cs[0].name, tail = cs[cs.length-1].name;
+    html += `<div class="daycard" data-day="${i}" style="border-left-color:${d.color}">
+      <div>
+        <div class="dn"><b style="color:${d.color}">${i+1}일차</b> · ${d.date} · ${(d.meta||[])[0]||''}</div>
+        <div class="dt">${d.title}</div>
+        <div class="dm">📍 ${head} → ${tail} · 코스 ${cs.length}곳<br>
+          📸 ${(d.photo||[]).length} · 🍽 ${(d.food||[]).length} · 🚁 ${(d.drone||[]).length} · 🏨 ${(d.stay||[]).length||'—'}</div>
+        <div class="go">${i+1}일차 상세 보기 →</div>
+      </div></div>`;
+  });
+
+  html += `<div class="stay-note">🗺 지도의 색이 곧 일차입니다. 큰 원은 각 일차의 <b>출발·도착 지점</b>, 작은 점은 경유지예요.
+  <b>2~4일차는 코스와 코스 사이를 실제 해안도로 선형에 맞춰</b> 그려서 동해안을 따라 달리는 모양 그대로 보입니다.
+  왼쪽 아래 <b>'지도에 표시'</b>에서 포토존·맛집·드론·숙박 아이콘을 켜고 끌 수 있어요.</div>
+  <div class="drivebar">🚗 <b>총 주행 약 980km</b> · 4박 5일 · 경기 광주 출발/도착<br>
+  1일차 430km(문경 경유 이동일) → 2일차 190km → 3일차 200km → 4일차 90km → 5일차 260km(귀가일).
+  중간 사흘이 가벼워 실제 체감은 편안한 편입니다.</div>`;
+
+  document.getElementById('panel').innerHTML = html;
+  document.getElementById('panel').scrollTop = 0;
+  document.querySelectorAll('.daycard').forEach(el=>{
+    el.addEventListener('click', ()=>{ curDay = +el.dataset.day; curCat = 'course'; render(); });
+  });
+}
+
+function renderPanel(){
+  if(curDay === -1){ renderOverview(); return; }
+  const day = DAYS[curDay];
+  let html = '';
+
+  if(curCat === 'course'){
+    html += `<a class="route-btn" href="${gmapsLink(day)}" target="_blank">➤&nbsp;구글맵으로 전체 경로 열기</a>`;
+    let mk = 0;
+    day.stops.forEach(s=>{
+      if(s.sect){ html += `<div class="sect">${s.sect}</div>`; return; }
+      const isMk = !s.skip;
+      const num = isMk ? `<span class="num" style="background:${day.color}">${mk+1}</span>` : '';
+      const id  = isMk ? `id="card-${mk}" data-mk="${mk}"` : '';
+      html += `<div class="card${s.road?' roadcard':''}" ${id}>
+        <div class="ic">${s.ic}</div>
+        <div><div class="t">${s.t}</div>
+        <div class="nm">${num}${s.name}${s.badge?BADGES[s.badge]:''}</div>
+        <div class="ds">${s.ds}</div></div></div>`;
+      if(isMk) mk++;
+    });
+    if(day.tip) html += `<div class="drivebar">${day.tip}</div>`;
+  }
+  else {
+    const list = day[curCat] || [];
+    const c = CAT[curCat];
+    if(curCat === 'drone' && day.droneWarn) html += `<div class="warn">${day.droneWarn}</div>`;
+    if(curCat === 'stay' && !list.length){
+      html += `<div class="drivebar">마지막 날은 귀가하는 일정이라 숙박이 없습니다. 대신 4일차 속초 숙소에서 체크아웃 후 바로 설악산으로 이동하세요.</div>`;
+    }
+    list.forEach((p,idx)=>{
+      const tags = (p.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+      html += `<div class="card" id="card-${idx}" data-mk="${idx}">
+        <div class="ic" style="background:${c.color}22;color:${c.color}">${p.ic}</div>
+        <div style="min-width:0">
+          <div class="t">${c.label} ${idx+1}</div>
+          <div class="nm">${p.name}</div>
+          <div class="ds">${p.ds}</div>
+          ${p.ad?`<div class="ad">📍 ${p.ad}</div>`:''}
+          ${tags?`<div>${tags}</div>`:''}
+          <div style="margin-top:7px;font-size:11.5px;color:#6ec6ff">자세히 보기 →</div>
+        </div></div>`;
+    });
+    if(curCat === 'stay' && list.length){
+      html += `<div class="stay-note">🅿️ 세 곳 모두 <b>객실 앞 또는 건물 부설 주차</b>가 되는 드라이브인 구조로 골랐습니다. 짐 많은 드라이브 여행엔 주차 동선이 곧 편의예요. 11월 초는 비수기라 당일 예약도 가능하지만, 오션뷰 지정은 미리 전화로 요청하는 게 확실합니다.</div>`;
+    }
+    if(curCat === 'food'){
+      html += `<div class="stay-note">🍽 <b>11월 초 제철</b> — 대게(11/1 금어기 해제·첫물), 홍게, 곰치국(물곰탕), 도루묵, 양미리. 영덕·울진 구간에서 대게를 한 번 제대로 드시고, 나머지는 물회·순두부·닭강정으로 가볍게 가는 배분을 추천합니다.</div>`;
+    }
+  }
+
+  document.getElementById('panel').innerHTML = html;
+  document.getElementById('panel').scrollTop = 0;
+
+  document.querySelectorAll('.card[data-mk]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const i = +el.dataset.mk;
+      document.querySelectorAll('.card').forEach(x=>x.classList.remove('hl'));
+      el.classList.add('hl');
+      openDetail(curCat, curDay, i);
+    });
+  });
+}
+
+function renderHead(){
+  const st = document.getElementById('subtabs');
+  if(curDay === -1){
+    document.getElementById('pday').textContent   = '전체 일정';
+    document.getElementById('ptitle').textContent = '포항 → 속초 4박5일 동해안 드라이브';
+    document.getElementById('psub').textContent   = '5일치 경로를 색상별로 한눈에. 지도의 선·원 색이 각 일차이고, 아이콘은 포토존·맛집·드론촬영지·숙박입니다.';
+    document.getElementById('pmeta').innerHTML    = ['📅 2026.11.2~11.6','🚗 총 950km','🏁 경기 광주 출발/도착'].map(m=>`<span class="chip">${m}</span>`).join('');
+    st.style.display = 'none';
+    return;
+  }
+  st.style.display = 'flex';
+  const day = DAYS[curDay];
+  document.getElementById('pday').textContent   = `${curDay+1}일차 · ${day.date}`;
+  document.getElementById('ptitle').textContent = day.title;
+  document.getElementById('psub').textContent   = day.sub;
+  document.getElementById('pmeta').innerHTML    = (day.meta||[]).map(m=>`<span class="chip">${m}</span>`).join('');
+}
+
+function render(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', +t.dataset.d === curDay));
+  document.querySelectorAll('.stab').forEach(t=>t.classList.toggle('on', t.dataset.cat===curCat));
+  renderHead(); renderPanel(); drawMarkers(); renderLayerBox();
+}
+
+/* ---- 탭 생성 ---- */
+const tabsEl = document.getElementById('tabs');
+const allBtn = document.createElement('button');
+allBtn.className = 'tab all'; allBtn.dataset.d = -1;
+allBtn.innerHTML = `🗺 전체경로<small>5일 한눈에</small>`;
+function expandSheet(){ if(window.innerWidth <= 900 && sheetIdx === 0){ sheetIdx = 1; applySheet(); } }
+allBtn.onclick = ()=>{ curDay = -1; expandSheet(); render(); };
+tabsEl.appendChild(allBtn);
+DAYS.forEach((d,i)=>{
+  const b = document.createElement('button');
+  b.className = 'tab'; b.dataset.d = i;
+  b.innerHTML = `${i+1}일차<small>${d.date}</small>`;
+  b.onclick = ()=>{ curDay = i; curCat='course'; expandSheet(); render(); };
+  tabsEl.appendChild(b);
+});
+const stEl = document.getElementById('subtabs');
+Object.keys(CAT).forEach(k=>{
+  const b = document.createElement('button');
+  b.className = 'stab'; b.dataset.cat = k;
+  b.textContent = CAT[k].icon + ' ' + CAT[k].label;
+  b.onclick = ()=>{ curCat = k; expandSheet(); render(); };
+  stEl.appendChild(b);
+});
+
+/* ---- 레이어 토글 박스 ---- */
+function renderLayerBox(){
+  const rows = document.getElementById('layerRows');
+  rows.innerHTML = ['photo','food','drone','stay'].map(k=>{
+    const c = CAT[k];
+    return `<div class="lrow ${SHOW[k]?'on':'off'}" data-l="${k}">
+      <div class="sw" style="background:${c.color}">${c.icon}</div>
+      <div class="lb">${c.label}</div>
+      <div class="ck">${SHOW[k]?'✓':''}</div></div>`;
+  }).join('');
+  rows.querySelectorAll('.lrow').forEach(el=>{
+    el.addEventListener('click', ()=>{ SHOW[el.dataset.l] = !SHOW[el.dataset.l]; drawMarkers(); renderLayerBox(); });
+  });
+  document.getElementById('legendDays').innerHTML =
+    DAYS.map((d,i)=>`<span><i style="background:${d.color}"></i>${i+1}일차</span>`).join('');
+}
+
+/* ================= 모바일 하단 시트 ================= */
+const PANEL = document.getElementById('panelBox');
+const SHEET = ['min','mid','max'];
+const SHEET_TXT = ['탭하면 일정 열기', '탭하면 넓게 보기', '탭하면 지도 보기'];
+let sheetIdx = 1;                                   // 기본 = 중간 높이
+function isMobileView(){ return false; }
+function applySheet(){
+  PANEL.classList.remove('min','max');
+  if(SHEET[sheetIdx] !== 'mid') PANEL.classList.add(SHEET[sheetIdx]);
+  const t = document.getElementById('grabTxt'); if(t) t.textContent = SHEET_TXT[sheetIdx];
+  setTimeout(()=>{ map.invalidateSize(); }, 290);
+}
+document.getElementById('grab').addEventListener('click', ()=>{
+  sheetIdx = (sheetIdx + 1) % 3; applySheet();
+});
+/* 손잡이 위아래로 끌어서 조절 */
+(function(){
+  const g = document.getElementById('grab');
+  let y0 = null;
+  g.addEventListener('touchstart', e=>{ y0 = e.touches[0].clientY; }, {passive:true});
+  g.addEventListener('touchmove', e=>{
+    if(y0 === null) return;
+    const dy = e.touches[0].clientY - y0;
+    if(Math.abs(dy) < 32) return;
+    sheetIdx = Math.max(0, Math.min(2, sheetIdx + (dy > 0 ? -1 : 1)));
+    y0 = null; applySheet();
+  }, {passive:true});
+  g.addEventListener('touchend', ()=>{ y0 = null; }, {passive:true});
+})();
+/* 지도를 탭하면 시트를 줄여 지도를 넓게 */
+map.on('click', ()=>{ if(isMobileView() && sheetIdx > 0){ sheetIdx = 0; applySheet(); } });
+PANEL.addEventListener('transitionend', e=>{ if(e.propertyName === 'height') map.invalidateSize(); });
+let rzT;
+window.addEventListener('resize', ()=>{ clearTimeout(rzT); rzT = setTimeout(()=>{ map.invalidateSize(); render(); }, 220); });
+window.addEventListener('orientationchange', ()=>{ setTimeout(()=>{ map.invalidateSize(); render(); }, 400); });
+applySheet();
+
+/* ================= 카카오내비 실행 ================= */
+const IS_MOBILE = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+(function loadKakaoSdk(){
+  if(!KAKAO_JS_KEY) return;
+  const s = document.createElement('script');
+  s.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
+  s.onload = ()=>{ try{ window.Kakao.init(KAKAO_JS_KEY); }catch(e){} };
+  document.head.appendChild(s);
+})();
+
+function startKakaoNavi(name, lat, lng){
+  // ① 공식 SDK (JavaScript 키가 있을 때) — 카카오내비 앱을 목적지까지 바로 실행
+  if(KAKAO_JS_KEY && window.Kakao && window.Kakao.Navi){
+    try{ window.Kakao.Navi.start({ name, x:lng, y:lat, coordType:'wgs84' }); return; }catch(e){}
+  }
+  // ② 키가 없을 때 — 모바일이면 앱 스킴을 순차 시도
+  const webFallback = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`;
+  if(!IS_MOBILE){ window.open(webFallback, '_blank'); return; }
+
+  let left = false;
+  const onHide = ()=>{ if(document.hidden) left = true; };
+  document.addEventListener('visibilitychange', onHide);
+
+  // 카카오내비 앱 → 실패하면 카카오맵 내비 → 그래도 안 되면 웹
+  location.href = `kakaonavi://navigate?name=${encodeURIComponent(name)}&x=${lng}&y=${lat}&coord_type=wgs84`;
+  setTimeout(()=>{ if(!left) location.href = `kakaomap://startnavi?type=safedrive&ep=${lat},${lng}`; }, 900);
+  setTimeout(()=>{ document.removeEventListener('visibilitychange', onHide);
+                   if(!left) location.href = webFallback; }, 2200);
+}
+
+/* ================= 상세 정보 레이어(모달) ================= */
+const MODAL = document.getElementById('modal');
+function openDetail(cat, dayIdx, idx){
+  const day = DAYS[dayIdx];
+  let p, kind, extra = '';
+
+  if(cat === 'course'){
+    p = courseStops(day)[idx]; kind = '코스';
+    extra = `<div class="mrow"><span class="mk2">시간</span><span>${p.t}</span></div>`;
+  } else {
+    p = (day[cat]||[])[idx]; kind = CAT[cat].label;
+    if(p.ad) extra += `<div class="mrow"><span class="mk2">주소</span><span>${p.ad}</span></div>`;
+  }
+  if(!p) return;
+
+  const c = CAT[cat];
+  const near = nearestStop(day, p.coord);
+  const tags = (p.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+
+  let body = `<figure class="m-photo" aria-label="${escapeHtml(p.name)} 대표 사진">
+    <img alt="${escapeHtml(p.name)} 대표 사진" decoding="async">
+    <div class="m-photo-status">🖼️ 대표 사진을 불러오는 중…</div>
+    <figcaption class="m-photo-credit"></figcaption>
+  </figure><div class="mds">${p.ds}</div>`;
+  if(tags) body += `<div style="margin-top:8px">${tags}</div>`;
+
+  body += `<div class="mtable">
+    <div class="mrow"><span class="mk2">일차</span><span style="color:${day.color};font-weight:bold">${dayIdx+1}일차 · ${day.date}</span></div>
+    ${extra}
+    <div class="mrow"><span class="mk2">동선</span><span>${near}</span></div>
+    <div class="mrow"><span class="mk2">좌표</span><span>${p.coord[0].toFixed(4)}, ${p.coord[1].toFixed(4)}</span></div>
+  </div>
+  <div style="font-size:11.5px;color:#7f8ba1;margin-top:9px;line-height:1.55">
+    🚘 휴대폰에서 <b>카카오내비 길안내</b>를 누르면 카카오내비 앱이 이 좌표를 목적지로 바로 실행합니다.
+    ${KAKAO_JS_KEY ? '' : 'PC에서는 카카오맵 웹으로 열립니다.'}
+  </div>`;
+
+  if(cat === 'drone'){
+    body += `<div class="warn" style="margin:12px 0 0">${day.droneWarn||'비행 전 드론원스톱에서 공역을 확인하세요.'}</div>
+    <div class="mnote">🚁 <b>촬영 체크리스트</b> — ① 250g 초과 기체는 기체신고·조종자 준수사항 필수 ② 일몰 후 야간비행 금지(별도 특별비행승인 필요) ③ 고도 150m 이하 ④ 사람·차량 직상공 회피 ⑤ 해안은 바람이 강하니 배터리 30% 여유.</div>`;
+  }
+  if(cat === 'stay'){
+    body += `<div class="mnote">🅿️ 객실 앞 또는 건물 부설 주차가 되는 <b>드라이브인 구조</b>로 선별했습니다. 오션뷰 객실은 예약 시 전화로 지정 요청하는 게 확실해요. 11월 초는 비수기라 요금·객실 여유가 있는 편입니다.</div>`;
+  }
+  if(cat === 'photo'){
+    body += `<div class="mnote">📸 <b>촬영 팁</b> — 11월 초 동해안 일출 07:00 / 일몰 17:20 기준. 해가 낮게 깔려 오전·오후 모두 골든아워가 길게 유지됩니다.</div>`;
+  }
+  if(cat === 'food'){
+    body += `<div class="mnote">🍽 <b>11월 초 제철</b> — 대게(11/1 금어기 해제 첫물), 홍게, 곰치국, 도루묵, 양미리. 대게는 영덕·울진에서 한 번 제대로 드시는 걸 권합니다.</div>`;
+  }
+
+  MODAL.querySelector('.m-ic').style.background = c.color + '22';
+  MODAL.querySelector('.m-ic').style.color = c.color;
+  MODAL.querySelector('.m-ic').textContent = p.ic || c.icon;
+  MODAL.querySelector('.m-kind').innerHTML = `<span style="color:${c.color}">${c.icon} ${kind}</span> · ${dayIdx+1}일차`;
+  MODAL.querySelector('.m-title').textContent = p.name;
+  MODAL.querySelector('.m-body').innerHTML = body;
+  loadRepresentativePhoto(p, day, cat);
+  MODAL.querySelector('.m-nav').href  = naverSearch(p.name);
+  MODAL.querySelector('.m-gmap').href = `https://www.google.com/maps/search/?api=1&query=${p.coord[0]},${p.coord[1]}`;
+  MODAL.querySelector('.m-navi').onclick = ()=>startKakaoNavi(p.name, p.coord[0], p.coord[1]);
+  MODAL.classList.add('open');
+  if(HAS_MAP) map.flyTo(p.coord, 15, {duration:.7});
+}
+
+/* 장소명+좌표 인근 지역으로 온라인 이미지 검색 URL을 구성합니다. */
+let photoRequestToken = 0;
+function escapeHtml(value){
+  return String(value||'').replace(/[&<>\"]/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch]));
+}
+const PHOTO_AREAS = [
+  ['경기 광주',37.4292,127.2550],['진남교반',36.6592,128.1296],['상주 경천대',36.4582,128.2440],
+  ['구룡포',35.9914,129.5598],['호미곶',36.0760,129.5665],['포항 영일대',36.0570,129.3785],
+  ['이가리',36.1946,129.3866],['내연산 보경사',36.2720,129.3250],['영덕 강구항',36.3592,129.3856],
+  ['영덕 해맞이공원',36.4245,129.4363],['울진 후포항',36.6774,129.4529],['울진 망양정',36.9297,129.4165],
+  ['울진 죽변항',37.0543,129.4237],['삼척 장호항',37.2867,129.3196],['삼척 해안',37.4400,129.1900],
+  ['동해 추암',37.4756,129.1610],['동해 무릉계곡',37.4555,129.0100],['강릉 헌화로',37.6520,129.0470],
+  ['강릉 안목해변',37.7716,128.9470],['강릉 경포대',37.7790,128.8780],['강릉 초당동',37.7905,128.9155],
+  ['강릉 주문진',37.8910,128.8290],['양양 남애항',37.9500,128.7800],['양양 서피비치',38.0462,128.7113],
+  ['양양 하조대',38.0221,128.7266],['양양 낙산사',38.1249,128.6301],['속초',38.2047,128.5902],
+  ['속초 영랑호',38.2143,128.5745],['설악산',38.1735,128.4870],['미시령',38.2166,128.4258]
+].map(([label,lat,lng])=>({label,lat,lng}));
+function nearestPhotoArea(coord){
+  if(!coord) return {label:'동해안'};
+  return PHOTO_AREAS.reduce((best,a)=>{
+    const d=Math.hypot((a.lat-coord[0])*111,(a.lng-coord[1])*88);
+    return !best||d<best.d?{...a,d}:best;
+  },null);
+}
+function placePhoto(name,coord){
+  const area=nearestPhotoArea(coord).label;
+  const base=String(name||'').replace(/\((점심|저녁|아침|포장|체크인|이른 아침)[^)]*\)/g,'').trim();
+  const query=`${base} ${area} 실제 장소 사진`;
+  const encoded=encodeURIComponent(query);
+  return {
+    url:`https://tse2.mm.bing.net/th?q=${encoded}&w=1200&h=675&c=7&rs=1&p=0`,
+    search:`https://www.bing.com/images/search?q=${encoded}`, area
+  };
+}
+function loadRepresentativePhoto(p){
+  ++photoRequestToken;
+  const figure = MODAL.querySelector('.m-photo');
+  const img = figure&&figure.querySelector('img');
+  const credit = figure&&figure.querySelector('.m-photo-credit');
+  if(!figure||!img||!credit) return;
+  const meta = placePhoto(p.name,p.coord);
+  img.onload = ()=>figure.classList.add('ready');
+  img.onerror = ()=>{ figure.querySelector('.m-photo-status').textContent='🖼️ 대표 사진을 불러오지 못했습니다.'; };
+  img.src = meta.url;
+  credit.innerHTML = `<a href="${meta.search}" target="_blank" rel="noopener">${escapeHtml(p.name)} 대표 사진</a> · ${escapeHtml(meta.area)}`;
+}
+function nearestStop(day, coord){
+  const cs = courseStops(day);
+  let best = null, bd = 1e9;
+  cs.forEach((s,i)=>{
+    const d = Math.hypot((s.coord[0]-coord[0])*111, (s.coord[1]-coord[1])*88);
+    if(d < bd){ bd = d; best = {s,i}; }
+  });
+  if(!best) return '-';
+  return bd < 0.4 ? `코스 ${best.i+1}번 「${best.s.name}」 바로 옆`
+       : `코스 ${best.i+1}번 「${best.s.name}」에서 약 ${bd.toFixed(1)}km`;
+}
+function closeDetail(){ photoRequestToken++; MODAL.classList.remove('open'); }
+MODAL.addEventListener('click', e=>{ if(e.target === MODAL) closeDetail(); });
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeDetail(); });
+/* 모바일: 시트를 아래로 쓸어내리면 닫기 */
+(function(){
+  const s = MODAL.querySelector('.mhead'); let y0 = null;
+  s.addEventListener('touchstart', e=>{ y0 = e.touches[0].clientY; }, {passive:true});
+  s.addEventListener('touchmove', e=>{ if(y0!==null && e.touches[0].clientY - y0 > 60){ y0=null; closeDetail(); } }, {passive:true});
+  s.addEventListener('touchend', ()=>{ y0 = null; }, {passive:true});
+})();
+
+render();
+setTimeout(()=>{ map.invalidateSize(); render(); }, 200);
+</script>
+</body>
+</html>
