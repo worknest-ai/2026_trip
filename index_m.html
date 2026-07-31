@@ -699,7 +699,7 @@ const HAS_MAP = (typeof L !== 'undefined' && L && typeof L.map === 'function');
 let map, layerGroup;
 if(HAS_MAP){
   document.getElementById('map').innerHTML = '';
-  map = L.map('map', { zoomControl:true, tap:true }).setView([37.4,129.0], 8);
+  map = L.map('map', { zoomControl:true, tap:true }).setView([37.2,128.7], 7);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     maxZoom:19, attribution:'&copy; OpenStreetMap &copy; CARTO'
   }).addTo(map);
@@ -825,16 +825,18 @@ function drawMarkers(){
   const poi = addPois(day, curDay, false);
   fit(routeLine(day).concat(poi));
 }
-/* 패널을 피해서 지도를 맞춤 (모바일 = 아래쪽, 데스크톱 = 오른쪽) */
+/* 현재 지도 컨테이너 안에 코스가 모두 보이도록 맞춤 */
 function fit(coords){
   if(!HAS_MAP || !coords.length) return;
   const b = L.latLngBounds(coords);
-  const mob = window.innerWidth <= 900;
+  const mob = window.innerWidth <= 1200;
   let opt;
   if(mob){
-    const top = (document.querySelector('.topbar')||{}).offsetHeight || 130;
-    const bot = (document.getElementById('panelBox')||{}).offsetHeight || 300;
-    opt = { paddingTopLeft:[22, top + 14], paddingBottomRight:[22, bot + 14] };
+    const mapFocus = document.body.classList.contains('map-focus');
+    /* 지도 자체가 상단바 아래에 배치되어 있으므로 상단바·패널 높이를 중복 가산하지 않음 */
+    opt = mapFocus
+      ? { paddingTopLeft:[28,36], paddingBottomRight:[28,150], maxZoom:11 }
+      : { paddingTopLeft:[22,24], paddingBottomRight:[22,72], maxZoom:10 };
   } else {
     opt = { paddingTopLeft:[40, 120], paddingBottomRight:[460, 40] };
   }
@@ -1038,7 +1040,11 @@ function setMobileView(view){
   document.body.classList.toggle('map-focus',mapFocus);
   document.body.classList.toggle('list-focus',!mapFocus);
   document.querySelectorAll('.mobile-view-switch button').forEach(btn=>btn.classList.toggle('on',btn.dataset.view===view));
-  setTimeout(()=>map.invalidateSize(),280);
+  /* 화면 전환 애니메이션이 끝난 뒤 새 지도 크기에 맞춰 현재 코스를 다시 표시 */
+  setTimeout(()=>{
+    map.invalidateSize();
+    drawMarkers();
+  },320);
 }
 document.querySelectorAll('.mobile-view-switch button').forEach(btn=>{
   btn.addEventListener('click',()=>setMobileView(btn.dataset.view));
@@ -1109,10 +1115,9 @@ function openDetail(cat, dayIdx, idx){
     <div class="mrow"><span class="mk2">일차</span><span style="color:${day.color};font-weight:bold">${dayIdx+1}일차 · ${day.date}</span></div>
     ${extra}
     <div class="mrow"><span class="mk2">동선</span><span>${near}</span></div>
-    <div class="mrow"><span class="mk2">좌표</span><span>${p.coord[0].toFixed(4)}, ${p.coord[1].toFixed(4)}</span></div>
   </div>
   <div style="font-size:11.5px;color:#7f8ba1;margin-top:9px;line-height:1.55">
-    🚘 휴대폰에서 <b>카카오내비 길안내</b>를 누르면 카카오내비 앱이 이 좌표를 목적지로 바로 실행합니다.
+    🚘 휴대폰에서 <b>카카오내비 길안내</b>를 누르면 카카오내비 앱이 이 장소를 목적지로 바로 실행합니다.
     ${KAKAO_JS_KEY ? '' : 'PC에서는 카카오맵 웹으로 열립니다.'}
   </div>`;
 
