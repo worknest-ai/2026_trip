@@ -193,6 +193,21 @@ if(typeof L === 'undefined'){
   .mbtn{ flex:1 1 auto; text-align:center; text-decoration:none; background:var(--card); border:1px solid var(--line2); color:#fff; border-radius:10px; padding:10px 12px; font-size:13px; font-weight:700; white-space:nowrap; }
   .mbtn.pri{ background:#fee500; color:#191919; border-color:#fee500; }
   .mbtn:hover{ filter:brightness(1.1); }
+  .mbtn.go{ background:#2a6ff0; border-color:#2a6ff0; }
+  /* 숙소·맛집 추천 */
+  .rec{ margin:14px 18px 0; border:1px solid var(--line2); border-radius:12px; overflow:hidden; background:#161e2d; }
+  .rec .rh{ display:flex; align-items:center; gap:8px; padding:10px 12px; background:var(--card2); font-size:14px; }
+  .rec .rn{ flex:none; width:22px; height:22px; border-radius:50%; background:var(--codex); color:#1a1405; font-weight:900; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .rec .rk{ margin-left:auto; flex:none; font-size:11px; color:var(--tx2); border:1px solid var(--line2); border-radius:20px; padding:2px 8px; white-space:nowrap; }
+  .rec .mcontent{ padding:2px 12px 0; }
+  .rec .mrow:last-child{ border-bottom:none; }
+  .rec .mbtns{ padding:8px 12px 12px; }
+  .rec .warn{ color:#ffb86b; }
+  .mrow .v a{ color:#8ab4ff; }
+  .recs{ margin-top:7px; display:flex; flex-direction:column; gap:3px; }
+  .recs .rc{ display:flex; gap:6px; align-items:baseline; min-width:0; font-size:12px; color:#d8dee8; }
+  .recs .rc b{ flex:none; color:var(--codex); }
+  .recs .rc span{ color:var(--tx3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .credit{ font-size:11px; color:var(--tx3); padding:10px 18px 0; line-height:1.5; }
 
   /* ============ 모바일 / 태블릿 ============ */
@@ -409,13 +424,13 @@ const DAYS = [
   items:[
     {type:'start', t:'10:00', name:'경기 광주 쌍령동 출발', ds:'중부고속도로 경기광주IC가 가까워 바로 남쪽으로 진입합니다.', coord:[37.4031,127.2708]},
     {type:'drive', text:'쌍령동 → 대전 장태산', d:'153km · 약 2시간 10분'},
-    {type:'meal', t:'12:15', name:'점심 · 장태산 주변 식당가', ds:'도토리묵·보리밥 등. 휴양림 입구 식당가는 평일 휴무가 있을 수 있어 출발 전 확인하세요.', coord:[36.2215,127.3370], q:'장태산 자연휴양림 식당'},
+    {type:'meal', t:'12:15', name:'점심 · 장태산 주변 한식', ds:'휴양림 입구에서 3~10분 거리. 월요일이라 휴무 여부를 출발 전 전화로 확인하세요.', coord:[36.2269,127.3449], q:'장태산 자연휴양림 식당', rk:'d1l'},
     {type:'spot', key:'jangtaesan', t:'13:10', t2:'15:40',
       shift:{to:'오후 1:10~3:40', why:'첫날 10시 출발이라 오전 도착이 불가능하고, 2~5일차 오전은 모두 일출형 명소(문광·주산지·간월재·우포)가 차지합니다. 오후 늦은 해가 서쪽에서 비스듬히 들어와 메타세쿼이아의 적갈색 줄기와 잎을 역광으로 살려 주고, 평일 오후라 스카이웨이도 비교적 한산합니다.'}},
     {type:'drive', text:'장태산 → 괴산읍', d:'104km · 약 1시간 45분'},
     {type:'opt', t:'17:30', name:'(선택) 문광저수지 저녁 답사', ds:'숙소에서 차로 약 10분. 일몰(17:43경) 무렵 한 번 둘러보며 내일 새벽 주차 위치와 반영 포인트를 미리 봐 두면 아침이 훨씬 수월합니다.', coord:[36.7678,127.7505]},
-    {type:'meal', t:'18:30', name:'저녁 · 괴산읍 식당가', ds:'올갱이국·민물매운탕 등 괴산 향토 메뉴. 일찍 쉬고 내일 06:10에 출발합니다.', coord:[36.8100,127.7930], q:'괴산읍 맛집'},
-    {type:'stay', t:'숙박', name:'괴산읍 일대', ds:'문광저수지까지 약 10분. 새벽 출발이 쉬운 읍내 숙소를 고르세요.', coord:[36.8128,127.7979], q:'괴산읍 숙박'}
+    {type:'meal', t:'18:30', name:'저녁 · 괴산읍 향토 한식', ds:'괴산 대표 올갱이국 등 혼자 주문 가능한 메뉴. 일찍 쉬고 내일 06:10에 출발합니다.', coord:[36.8083,127.7944], q:'괴산읍 맛집', rk:'d1d'},
+    {type:'stay', t:'숙박', name:'괴산읍 무인텔', ds:'문광저수지까지 약 10~15분. 1·2순위 무인텔이 나란히 있어 한 곳이 차면 옆집으로 가면 됩니다.', coord:[36.8128,127.7979], q:'괴산읍 숙박', rk:'d1s'}
   ],
   near:[{key:'beopjusa', d:'장태산에서 약 1시간 30분 · 대전→괴산 길에서 남동쪽으로 우회'}],
   tip:'💡 <b>첫날은 운전이 대부분</b>입니다. 장태산은 원래 오전 추천지지만 오후 1시 이후에도 숲 그늘과 사선광이 좋아 크게 손해 보지 않습니다. 스카이웨이·스카이타워 계단은 젖으면 미끄러우니 비 예보가 있으면 숲 아래 산책로 위주로 도세요.'
@@ -424,7 +439,7 @@ const DAYS = [
   color:'#2ecc9a', date:'10/27 (화)', short:'괴산 → 단양 → 영주',
   title:'문광저수지 일출 → 단양 보발재 → 영주 부석사 노을',
   sub:'새벽 물안개 반영으로 시작해 오전 보발재 S자 단풍길, 오후엔 부석사 안양루에서 소백산 능선 노을까지. 코덱스 추천 3곳이 시간대별로 정확히 맞물리는 날입니다.',
-  chips:['🚗 약 303km','⏱ 운전 약 5시간 30분','🌅 일출 약 06:54','🌇 일몰 약 17:39','🏨 청송 주왕산'],
+  chips:['🚗 약 303km','⏱ 운전 약 5시간 30분','🌅 일출 약 06:54','🌇 일몰 약 17:39','🏨 청송읍'],
   items:[
     {type:'start', t:'06:10', name:'괴산읍 숙소 출발', ds:'헤드랜턴·삼각대·따뜻한 겉옷 챙기기. 10월 말 새벽 기온은 한 자릿수입니다.', coord:[36.8128,127.7979]},
     {type:'spot', key:'mungwang', t:'06:20', t2:'08:00', ok:'원래 추천(일출 30분 전~오전 9시) 그대로 배정. 일출 약 06:54 기준 06:20 도착.'},
@@ -432,16 +447,16 @@ const DAYS = [
     {type:'drive', text:'괴산읍 → 단양 보발재', d:'100km · 약 1시간 55분'},
     {type:'spot', key:'bobaljae', t:'10:45', t2:'11:20', ok:'원래 추천(오전 8~11시) 안에 도착. 문광저수지 일출과 겹치는 시간이라 일출 후 바로 이동해 추천시간 끝자락에 맞췄습니다.'},
     {type:'drive', text:'보발재 → 단양읍', d:'24km · 약 35분'},
-    {type:'meal', t:'12:00', name:'점심 · 다원 (마늘떡갈비)', ds:'단양군 단양읍 삼봉로 172. 단양 육쪽마늘을 넣은 떡갈비 정식.', coord:[36.9850,128.3650], q:'단양 다원 마늘떡갈비'},
+    {type:'meal', t:'12:00', name:'점심 · 단양 마늘떡갈비', ds:'단양 육쪽마늘 떡갈비를 1인 정식으로 먹을 수 있는 2곳.', coord:[36.9850,128.3650], q:'단양 마늘떡갈비', rk:'d2l'},
     {type:'drive', text:'단양읍 → 영주 부석사', d:'50km · 약 1시간 10분'},
     {type:'spot', key:'buseoksa', t:'14:25', t2:'17:45',
       shift:{to:'오후 2:25~5:45 (일몰까지 연장)', why:'원래 추천(오후 2:30~5시)과 같은 시간대에 도착하되, 노을 추천 장소라 일몰(17:39경)까지 안양루에 머무르도록 끝 시간을 늘렸습니다.'}},
-    {type:'meal', t:'17:50', name:'저녁 · 부석사식당', ds:'영주시 부석면 부석사로 317. 산채비빔밥과 고등어구이. 주차장 바로 앞이라 하산 후 바로 식사.', coord:[36.9950,128.6840], q:'부석사식당'},
-    {type:'drive', text:'부석사 → 청송 주왕산 (야간)', d:'114km · 약 2시간'},
-    {type:'stay', t:'숙박', name:'청송 주왕산 관광지구', ds:'주산지까지 약 12분. 내일 05:50 출발이므로 도착 후 바로 휴식하세요. (대체: 청송읍 · 주산지 약 25분)', coord:[36.3933,129.1440], q:'청송 주왕산 숙박'}
+    {type:'meal', t:'17:50', name:'저녁 · 부석사 입구 산채정식', ds:'주차장 앞 상가 2곳이라 하산 후 바로 식사. 20시까지 여는 곳이 1순위입니다.', coord:[36.9950,128.6840], q:'부석사 식당', rk:'d2d'},
+    {type:'drive', text:'부석사 → 청송읍 (야간)', d:'약 105km · 약 1시간 50분'},
+    {type:'stay', t:'숙박', name:'청송읍 모텔', ds:'주왕산면에는 야놀자로 예약되는 모텔·무인텔이 없어 청송읍으로 잡았습니다. 주산지까지 약 25~30분이라 내일 05:35에 출발합니다.', coord:[36.4340,129.0570], q:'청송읍 숙박', rk:'d2s'}
   ],
   near:[],
-  tip:'💡 <b>운전 시간이 가장 긴 날</b>이라 점심 이후는 서두르지 마세요. 부석사는 일주문→무량수전까지 오르막 석계단이 이어집니다. 일몰 뒤 하산길은 조명이 적으니 휴대폰 손전등이나 헤드랜턴을 쓰세요. 저녁 이동은 대부분 고속도로지만 마지막 주왕산 진입로는 어두운 산길입니다.'
+  tip:'💡 <b>운전 시간이 가장 긴 날</b>이라 점심 이후는 서두르지 마세요. 부석사는 일주문→무량수전까지 오르막 석계단이 이어집니다. 일몰 뒤 하산길은 조명이 적으니 휴대폰 손전등이나 헤드랜턴을 쓰세요. 저녁 이동은 대부분 고속도로지만 마지막 청송 진입로는 어두운 국도입니다.'
 },
 {
   color:'#f39c3d', date:'10/28 (수)', short:'청송 → 포항 → 경주',
@@ -449,18 +464,18 @@ const DAYS = [
   sub:'일출 주산지, 오전 출발 내연산 계곡 단풍, 그리고 원래 아침 추천인 도리마을은 오후 늦은 역광 시간으로 옮겼습니다. 저녁은 언양에서 불고기.',
   chips:['🚗 약 196km','⏱ 운전 약 3시간 40분','🌅 일출 약 06:46','🌇 일몰 약 17:36','🏨 울주 언양'],
   items:[
-    {type:'start', t:'05:50', name:'주왕산 숙소 출발', ds:'주산지 주차장에서 저수지까지 숲길로 약 15분 걷습니다.', coord:[36.3933,129.1440]},
+    {type:'start', t:'05:35', name:'청송읍 숙소 출발', ds:'주산지까지 차로 약 25~30분. 주차장에서 저수지까지 숲길로 약 15분 걷습니다.', coord:[36.4340,129.0570]},
     {type:'spot', key:'jusanji', t:'06:15', t2:'08:00', ok:'원래 추천(일출 30분 전~오전 9시) 그대로 배정. 일출 약 06:46 기준 06:15 도착.'},
     {type:'meal', t:'08:15', name:'아침 · 주왕산청솔식당', ds:'청송군 주왕산면 공원길 164. 산채더덕구이정식, 달기약수 백숙. 아침 영업 여부는 전날 숙소에서 확인하세요.', coord:[36.3910,129.1410], q:'주왕산청솔식당'},
     {type:'drive', text:'주왕산 → 포항 보경사', d:'53km · 약 1시간 10분'},
     {type:'spot', key:'naeyeonsan', t:'10:15', t2:'13:30', ok:'원래 추천(오전 8~11시 출발) 안에 출발. 관음폭포·연산폭포까지 왕복 약 3시간으로 잡아 오후 일정에 여유를 뒀습니다.'},
-    {type:'meal', t:'13:35', name:'점심 · 스마일식당', ds:'포항시 북구 송라면 보경로469번길 7. 산채비빔밥과 백숙. 공영주차장 바로 옆.', coord:[36.2445,129.3215], q:'보경사 스마일식당'},
+    {type:'meal', t:'13:35', name:'점심 · 보경사 입구 산채비빔밥', ds:'내연산 공영주차장 앞 식당가 2곳. 산행 후 바로 식사.', coord:[36.2447,129.3199], q:'보경사 식당', rk:'d3l'},
     {type:'drive', text:'보경사 → 경주 도리마을', d:'70km · 약 1시간 20분'},
     {type:'spot', key:'dori', t:'15:45', t2:'17:20',
       shift:{to:'오후 3:45~5:20', why:'원래 추천은 오전 7:30~10시지만 같은 날 아침은 주산지 일출, 오전은 내연산(오전 출발 필수)이 차지합니다. 늦은 오후의 낮은 해가 은행잎을 뒤에서 비추면(역광) 숲 전체가 금빛으로 빛나 오전과는 다른 그림이 나옵니다. 평일이라 오후 혼잡도도 덜합니다.'}},
     {type:'drive', text:'도리마을 → 울주 언양', d:'54km · 약 55분'},
-    {type:'meal', t:'18:20', name:'저녁 · 언양기와집불고기', ds:'울주군 언양읍 헌양길 86. 석쇠에 구운 언양불고기. 내일 새벽 산행 전 든든하게.', coord:[35.5655,129.1220], q:'언양기와집불고기'},
-    {type:'stay', t:'숙박', name:'울주 언양읍 일대', ds:'배내2공영주차장까지 약 40분. 편의점에서 내일 아침·물·간식을 미리 사 두세요.', coord:[35.5660,129.1210], q:'언양읍 숙박'}
+    {type:'meal', t:'18:20', name:'저녁 · 언양불고기', ds:'석쇠 언양불고기 2곳. 180g(1인분) 단위로 주문합니다. 내일 새벽 산행 전 든든하게.', coord:[35.5652,129.1255], q:'언양불고기', rk:'d3d'},
+    {type:'stay', t:'숙박', name:'언양 등억온천단지 드라이브인', ds:'1·2순위는 언양 서쪽 등억온천단지(저녁 식당에서 10~15분)라 배내2공영주차장까지 약 30분. 편의점에서 내일 아침·물·간식을 미리 사 두세요.', coord:[35.5560,129.0440], q:'등억온천 숙박', rk:'d3s'}
   ],
   near:[
     {key:'unmunsa', d:'도리마을에서 약 1시간 · 언양 가는 길에서 서쪽'},
@@ -474,16 +489,16 @@ const DAYS = [
   sub:'영남알프스 간월재를 오전에, 황매산 억새평전을 일몰에. 억새 고원 두 곳을 하루에 담는 대신 걷는 양이 가장 많은 날입니다.',
   chips:['🚗 약 264km','⏱ 운전 약 5시간','🥾 도보 약 14km','🌇 일몰 약 17:42','🏨 창녕읍'],
   items:[
-    {type:'start', t:'05:50', name:'언양 숙소 출발', ds:'배내골로 들어가는 산길은 어둡고 굽이가 많습니다. 서행하세요.', coord:[35.5660,129.1210]},
-    {type:'drive', text:'언양 → 배내2공영주차장', d:'23km · 약 45분'},
+    {type:'start', t:'06:00', name:'등억온천단지 숙소 출발', ds:'배내골로 들어가는 산길은 어둡고 굽이가 많습니다. 서행하세요. (브라운도트 언양점에 묵으면 05:50 출발)', coord:[35.5560,129.0440]},
+    {type:'drive', text:'등억온천단지 → 배내2공영주차장', d:'약 30분'},
     {type:'spot', key:'ganwoljae', t:'06:40', t2:'11:20', ok:'원래 추천(주차장 오전 6~7시 출발, 9~11시 억새평원 도착) 그대로. 06:40 출발 → 08:40 간월재 도착 → 1시간 머문 뒤 하산.'},
     {type:'drive', text:'배내2공영주차장 → 언양', d:'23km · 약 40분'},
-    {type:'meal', t:'12:05', name:'점심 · 언양 시내에서 가볍게', ds:'언양알프스시장 주변 국밥·칼국수 등. 오후 운전이 길어 과식은 피하세요.', coord:[35.5660,129.1210], q:'언양알프스시장 맛집'},
+    {type:'meal', t:'12:05', name:'점심 · 언양 국밥 한 그릇', ds:'언양알프스시장 주변 곰탕·국밥. 오후 운전이 길어 과식은 피하세요.', coord:[35.5636,129.1265], q:'언양알프스시장 맛집', rk:'d4l'},
     {type:'drive', text:'언양 → 합천 황매산 정상주차장', d:'144km · 약 2시간 20분'},
     {type:'spot', key:'hwangmaesan', t:'15:10', t2:'17:50', ok:'원래 추천(오후 3시~일몰) 그대로 배정. 일몰 약 17:42.'},
-    {type:'meal', t:'18:05', name:'저녁 · 황매산식당', ds:'합천군 가회면 황매산로 625. 산채비빔밥과 두루치기쌈밥.', coord:[35.4700,128.0030], q:'합천 황매산식당'},
+    {type:'meal', t:'18:05', name:'저녁 · 황매산 아랫마을', ds:'가회면 황매산로 식당 2곳(정상주차장에서 약 15~20분). 20시까지 여는 모산재식당이 1순위입니다.', coord:[35.4700,128.0030], q:'합천 황매산 식당', rk:'d4d'},
     {type:'drive', text:'황매산 → 창녕읍', d:'67km · 약 1시간 15분'},
-    {type:'stay', t:'숙박', name:'창녕읍 일대', ds:'우포늪생태관 주차장까지 약 11분. (대체: 부곡온천 · 약 30분, 온천 숙소에서 피로 회복)', coord:[35.5444,128.4924], q:'창녕읍 숙박'}
+    {type:'stay', t:'숙박', name:'창녕 무인텔', ds:'우포늪생태관 주차장까지 약 10~15분. (대체: 부곡온천 · 약 30분, 온천 숙소에서 피로 회복)', coord:[35.5444,128.4924], q:'창녕읍 숙박', rk:'d4s'}
   ],
   near:[
     {key:'tongdosa', d:'언양에서 약 16분 · 간월재 하산 후 남쪽'},
@@ -507,6 +522,65 @@ const DAYS = [
   tip:'💡 우포늪은 탐방로 일부가 수위·생태 보호로 통제될 수 있습니다. 2시간 30분 코스는 생태관 → 전망대 → 대대제방 → 왕버들 조망 중심으로 짰습니다. 금요일 오후 수도권 진입 정체를 피하려면 10시 전에는 출발하세요.'
 }
 ];
+
+/* 숙소·맛집 추천 (2026.10.23 조사) — 일정 항목의 rk 키로 연결
+   숙소: 야놀자 검색 화면 최저가(성인 2명 표시 기준), 드라이브인·무인텔·신축 우선
+   맛집: 한식·1인 주문 가능 메뉴, 리뷰 평점 순 */
+const Y = id => `https://nol.yanolja.com/stay/domestic/${id}`;
+const RECS = {
+  d1l:[
+    {name:'호숫가에서 본점', kind:'수육쌈밥', menu:'수육쌈밥정식 15,000원 · 제육쌈밥정식 14,000원', hours:'월 11:30~20:00 (주문마감 19:00)', rating:'카카오 4.0 (평가 33)', addr:'대전 서구 장안로 354-14', tel:'042-581-3303', url:'https://place.map.kakao.com/15222615', why:'휴양림 입구에서 3~5분, 20년 넘게 이어 온 수육쌈밥집', warn:'월요일 휴무 정보가 출처마다 달라 전화 확인 · 1인 주문 가능 여부 미확인', q:'장태산 호숫가에서'},
+    {name:'금평', kind:'추어탕', menu:'추어탕 (가격 미확인)', hours:'확인 불가', rating:'카카오 4.1 (평가 16, 리뷰 64)', addr:'대전 서구 장안로 53 (흑석동)', tel:'042-582-2120 / 042-583-6866', url:'https://place.map.kakao.com/8705447', why:'한 그릇 메뉴라 혼밥하기 좋은 3대째 모범음식점 · 휴양림에서 약 10분', warn:'영업시간·가격 미확인이라 꼭 전화 후 방문', q:'대전 흑석동 금평'}
+  ],
+  d1d:[
+    {name:'주차장식당', kind:'올갱이국', menu:'올갱이국 12,000원', hours:'월 07:00~20:00 · 정기휴무 없음(후기)', rating:'카카오 3.9 (평가 22) · 다이닝코드 4.4', addr:'충북 괴산군 괴산읍 읍내로 282', tel:'043-832-2673', url:'https://place.map.kakao.com/21340665', why:'월요일 저녁 영업 확인, 괴산 대표 올갱이국을 한 그릇씩', q:'괴산 주차장식당'},
+    {name:'즐거운날', kind:'황태·새뱅이', menu:'황태구이정식 15,000원 (새뱅이전골은 2인용)', hours:'월 10:00~20:00 (다이닝코드 기준)', rating:'카카오 3.9 (리뷰 239) · 다이닝코드 4.7', addr:'충북 괴산군 괴산읍 읍내로2길 33', tel:'043-833-1193', url:'https://place.map.kakao.com/19725153', why:'괴산읍에서 리뷰가 가장 많은 한식당, 1인 1식 정식 가능', warn:'월요일 휴무라는 소개글도 있어 전화 확인', q:'괴산 즐거운날'}
+  ],
+  d1s:[
+    {name:'괴산 S무인텔', kind:'무인텔', price:'60,000원~ (입실 16:00)', rating:'야놀자 4.7 (169) · 여기어때 9.1 (128)', built:'확인 불가', dist:'문광저수지까지 약 15분', addr:'충북 괴산군 괴산읍 문무로 264-1', tel:'043-832-5094', url:Y(1000109005), why:'괴산읍 무인텔 중 평점이 가장 높고 비대면 체크인이 편하다는 후기', warn:'독립 차고(드라이브인) 구조인지는 미확인'},
+    {name:'괴산 Y무인텔', kind:'무인텔', price:'60,000원~ (입실 16:00)', rating:'야놀자 4.4 (150)', built:'확인 불가', dist:'문광저수지까지 약 15분', addr:'충북 괴산군 괴산읍 문무로 264', tel:'043-832-5093', url:Y(1000109006), why:'S무인텔 바로 옆이라 S무인텔이 마감되면 대안'},
+    {name:'괴산 호텔 더킹', kind:'일반 모텔', price:'70,000원~ (입실 17:00)', rating:'야놀자 4.8 (292) · 여기어때 9.4 (226)', built:'확인 불가 (노후 건물이라는 후기)', dist:'문광저수지까지 약 10~12분', addr:'충북 괴산군 괴산읍 읍내로15길 30', tel:'', url:Y(10046950), why:'읍내 중심이라 저녁 식당과 가까움', warn:'조회 때 예약마감 표시 · 주차장 만차 시 주차 불가 · 칫솔·치약 미제공'}
+  ],
+  d2l:[
+    {name:'서울식당 (단양)', kind:'마늘떡갈비', menu:'마늘떡갈비+산채한정식 17,000원 · 더덕비빔밥 12,000원', hours:'화 09:00~20:00 · 연중무휴', rating:'카카오 4.1 (리뷰 642) · 다이닝코드 4.5', addr:'충북 단양군 단양읍 고수동굴길 4-10', tel:'043-422-2808', url:'https://www.diningcode.com/profile.php?rid=cshO83Y1TJ3l', why:'리뷰가 가장 많고 1인 떡갈비 정식이 있음', warn:'20,000원 세트 2종은 2인 이상 주문', q:'단양 서울식당 고수동굴길'},
+    {name:'다원', kind:'마늘떡갈비', menu:'마늘떡갈비 22,000원 (+곤드레밥·된장찌개 5,000원)', hours:'화 11:30~20:30 · 브레이크 14:45~17:30', rating:'다이닝코드 4.1 (15) · 카카오 리뷰 151', addr:'충북 단양군 단양읍 삼봉로 172', tel:'043-423-8050', url:'https://www.diningcode.com/profile.php?rid=697a9tVtpx5K', why:'숯불향이 좋다는 평이 많은 떡갈비집', warn:'가격이 높은 편 · 1시간 대기 후기 있음', q:'단양 다원 마늘떡갈비'}
+  ],
+  d2d:[
+    {name:'종점식당', kind:'산채정식', menu:'산채정식 13,000원 · 간고등어정식 15,000원', hours:'매일 08:00~20:00', rating:'다이닝코드 4.3 · 카카오 3.5 (평가 26)', addr:'경북 영주시 부석면 부석사로 319', tel:'054-633-3606', url:'https://www.diningcode.com/profile.php?rid=qk9GCnvNHvbA', why:'20시까지 열어 일몰 뒤 도착해도 여유, 청국장·간고등어가 함께 나옴', q:'부석사 종점식당'},
+    {name:'부석사식당', kind:'청국장정식', menu:'청국장정식 13,000원 · 산채비빔밥 12,000원', hours:'08:00~19:00', rating:'카카오 2.6 (평가 24) · 다이닝코드 3.6', addr:'경북 영주시 부석면 부석사로 317', tel:'054-633-3317', url:'https://www.diningcode.com/profile.php?rid=M466nsdNm4Ul', why:'혼밥 후기가 있고 주차장 바로 앞', warn:'19시 마감이라 17:50 도착은 빠듯 · 평점 낮음', q:'영주 부석사식당'}
+  ],
+  d2s:[
+    {name:'청송 백운장 모텔', kind:'모텔 · 셀프체크인', price:'70,000원~ (입실 17:00)', rating:'야놀자 4.8 (546) · 여기어때 9.5 (321)', built:'리모델링 (연도 미확인)', dist:'주산지까지 약 25~30분', addr:'경북 청송군 청송읍 금월로 244', tel:'054-872-6400', url:Y(1000108721), why:'평점·리뷰 수가 높고 리모델링된 곳, 주차장이 넓음'},
+    {name:'청송 S모텔', kind:'모텔 · 객실별 주차', price:'39,000원~ (회원가, 입실 16:00)', rating:'야놀자 4.4 (328)', built:'리모델링 (연도 미확인)', dist:'주산지까지 약 25분', addr:'경북 청송군 청송읍 휴양단지길 23', tel:'', url:Y(1019654), why:'가장 저렴하고 객실마다 주차 1대가 배정돼 드라이브인에 가장 가까움'},
+    {name:'청송 갤러리', kind:'모텔', price:'57,000원~ (회원가)', rating:'야놀자 4.9 (596)', built:'확인 불가', dist:'주산지까지 약 25~30분', addr:'확인 불가 (청송읍 중앙로 451 갤러리쉼터모텔로 추정)', tel:'054-873-9405 (추정)', url:Y(1000109160), why:'세 곳 중 평점이 가장 높음', warn:'조회 때 예약마감으로 나온 적도 있어 앱에서 위치·예약 가능 여부 확인'}
+  ],
+  d3l:[
+    {name:'부원식당', kind:'산채비빔밥', menu:'산채비빔밥 10,000원', hours:'수 10:00~20:00 (화요일 휴무)', rating:'카카오 4.5 (평가 19, 리뷰 87)', addr:'경북 포항시 북구 송라면 보경로 451-8', tel:'054-262-0229', url:'https://www.diningcode.com/profile.php?rid=nffEgiEoGLWN', why:'식당가에서 리뷰가 가장 많고 공영주차장 바로 앞, 혼밥 후기', warn:'음식이 늦게 나온다는 리뷰', q:'보경사 부원식당'},
+    {name:'천령산식당', kind:'산채정식', menu:'산채비빔밥 13,000원 · 산채더덕정식 20,000원(1인)', hours:'09:00~20:00 · 연중무휴', rating:'카카오 4.6 (평가 14)', addr:'경북 포항시 북구 송라면 보경로 473', tel:'054-261-4330', url:'https://www.diningcode.com/profile.php?rid=K5vkVXoi1ESa', why:'쉬는 날이 없고 산행 후 식사 후기가 많음', q:'보경사 천령산식당'}
+  ],
+  d3d:[
+    {name:'공원불고기', kind:'언양불고기', menu:'석쇠불고기 180g 21,000원 + 된장찌개 2,000원 + 공기밥 1,000원', hours:'매일 10:00~21:00 (주문마감 20:00)', rating:'카카오 4.7 (평가 289)', addr:'울산 울주군 언양읍 헌양길 32', tel:'052-262-0421', url:'https://www.diningcode.com/profile.php?rid=CIJ9fCLHRbeb', why:'언양 불고기집 중 카카오 평점 최고, 가격도 가장 저렴', warn:'1인분 주문 가능 여부는 전화 확인', q:'언양 공원불고기'},
+    {name:'언양기와집불고기', kind:'언양불고기', menu:'언양불고기 180g 25,000원 + 된장찌개 4,000원 + 공기밥 1,000원', hours:'11:00~20:50 (주문마감 20:00)', rating:'카카오 3.7 (리뷰 1,155) · 다이닝코드 4.4', addr:'울산 울주군 언양읍 헌양길 86', tel:'052-262-4884', url:'https://www.diningcode.com/profile.php?rid=WFvQsuUd9OXQ', why:'가장 유명하고 리뷰가 압도적으로 많음, 혼밥 후기 있음', warn:'대기가 길어 테이블링 원격 줄서기 권장', q:'언양기와집불고기'}
+  ],
+  d3s:[
+    {name:'울산 영남알프스 브라보호텔', kind:'드라이브인', price:'45,000원~ (입실 17:00)', rating:'야놀자 4.8 (385) · 여기어때 9.7 (338)', built:'확인 불가', dist:'배내2공영주차장까지 약 30분', addr:'울산 울주군 상북면 알프스온천2길 62', tel:'052-254-8188', url:Y(1000100722), why:'전 객실 드라이브인·안마의자, 언양 서쪽 등억온천단지라 새벽 이동이 짧음'},
+    {name:'울산 영남알프스 니나인 무인텔', kind:'무인텔', price:'35,000원~ (입실 16:00)', rating:'야놀자 4.8 (537)', built:'2025년 1월 리모델링', dist:'배내2공영주차장까지 약 30분', addr:'울산 울주군 상북면 알프스온천2길 37', tel:'', url:Y(3009795), why:'가장 최근에 리모델링했고 가장 저렴함', warn:'날짜 없이 조회하면 55,000원으로 나오기도 함'},
+    {name:'브라운도트 울산언양점', kind:'모텔 · 2024년 신축', price:'60,000원~ (입실 17:00)', rating:'야놀자 4.9 (447) · 여기어때 9.6 (317)', built:'2024년 5월 신규 오픈', dist:'배내2공영주차장까지 약 35~40분 (언양 동쪽)', addr:'울산 울주군 언양읍 동부9길 26', tel:'0502-5551-2584', url:Y(10056493), why:'언양읍에서 가장 새 건물이고 평점도 가장 높음', warn:'드라이브인 아님'}
+  ],
+  d4l:[
+    {name:'알프스시장곰탕', kind:'소머리곰탕', menu:'소머리곰탕 11,000원 · 소고기국밥 11,000원', hours:'매일 08:00~19:30', rating:'블로그 리뷰 349건 평균 4.38 · 방송 출연', addr:'울산 울주군 언양읍 장터2길 12-1', tel:'052-264-0218', url:'https://www.diningcode.com/profile.php?rid=D1HdVED3UStP', why:'시장 한가운데 곰탕집, 10/29은 장날(2·7일)이 아니라 주차가 수월', warn:'점심에는 자리가 빨리 참', q:'언양 알프스시장곰탕'},
+    {name:'참한국밥 언양점', kind:'돼지국밥', menu:'순대·수육국밥 11,000원 · 1인세트 21,000원', hours:'10:00~22:00 · 브레이크 15:00~16:00 (화요일 휴무)', rating:'다이닝코드 등록 (점수 없음)', addr:'울산 울주군 언양읍 웃방천1길 20', tel:'052-264-1088', url:'https://www.diningcode.com/profile.php?rid=GfSOFD5RpxJ6', why:'1인세트 메뉴가 따로 있고 가게 앞에 4대 주차 가능', q:'참한국밥 언양점'}
+  ],
+  d4d:[
+    {name:'모산재식당', kind:'촌두부·비빔밥', menu:'가마솥촌두부 10,000원 · 삼겹살 12,000원 · 우렁된장비빔밥', hours:'매일 07:30~20:00', rating:'다이닝코드 4.0 (평가 2)', addr:'경남 합천군 가회면 황매산로 624', tel:'055-933-1101', url:'https://www.diningcode.com/profile.php?rid=kegJIuTtdRVl', why:'20시까지 열어 일몰 뒤 내려와도 시간 여유가 가장 큼', warn:'리뷰 수가 적음', q:'합천 모산재식당'},
+    {name:'황매산식당', kind:'산채비빔밥', menu:'된장·김치찌개 10,000원 · 산채비빔밥·두루치기쌈밥 13,000원', hours:'목 11:00~19:00 (주문마감 18:30)', rating:'블로그 후기 (별점 없음)', addr:'경남 합천군 가회면 황매산로 625', tel:'055-932-3883', url:'https://www.diningcode.com/profile.php?rid=pmBl76izIIRf', why:'메뉴가 다양하고 반찬 리필, 주차장이 넓음', warn:'마감시간 정보가 출처마다 달라(19시/20시) 당일 오후 전화 확인', q:'합천 황매산식당'}
+  ],
+  d4s:[
+    {name:'창녕 SS 무인호텔', kind:'무인텔 · 1실1주차', price:'30,000원~ (회원가, 입실 17:00)', rating:'야놀자 4.8 (930)', built:'확인 불가', dist:'우포늪까지 약 10~15분', addr:'경남 창녕군 대지면 미산길 3-50 (Trip.com 기준)', tel:'050-3505-16377 (안심번호)', url:Y(3011897), why:'후보 중 평점·리뷰 수가 가장 많고 가장 저렴함', warn:'주소는 Trip.com 기준이라 예약 전 지도에서 위치 확인'},
+    {name:'창녕 호텔 74st', kind:'일반 모텔', price:'60,000원~ (입실 17:00)', rating:'야놀자 4.7 (348) · 여기어때 9.3 (417)', built:'확인 불가 (전 객실 금연·스타일러·전기차 충전)', dist:'우포늪까지 약 11분', addr:'경남 창녕군 창녕읍 창녕대로 169', tel:'050-3505-31182 (안심번호)', url:Y(10055016), why:'창녕읍 안에 있고 깨끗하고 조용하다는 후기'},
+    {name:'창녕 궁 무인텔', kind:'무인텔 · 1실1주차', price:'40,000원~ (입실 18:00)', rating:'야놀자 4.3 (587)', built:'확인 불가', dist:'우포늪까지 약 10~15분', addr:'확인 불가', tel:'', url:Y(3008838), why:'1·2순위가 마감되면 쓸 예비안', warn:'주소·연락처를 앱에서 확인'}
+  ]
+};
 
 /* ---------------- 지도 ----------------
    카카오맵 우선. 카카오는 등록된 도메인(http://localhost:8080 등)에서만 열리므로
@@ -759,9 +833,10 @@ function renderDay(){
     }
     const em = {start:'🚗', end:'🏁', meal:'🍽', stay:'🏨', opt:'✨'}[it.type];
     const clickable = (it.type==='meal'||it.type==='stay'||it.type==='opt');
+    const recs = (RECS[it.rk]||[]).map((r,ri)=>`<div class="rc"><b>${ri+1}</b>${r.name}<span>${recShort(r)}</span></div>`).join('');
     h += `<div class="it" id="it-${ii}"><div class="tm">${it.t==='숙박'?'<small>숙박</small>':it.t}</div>
       <div class="card small ${it.type}${clickable?' click':''}" ${clickable?`data-i="${ii}"`:''}>
-        <div class="ic">${em}</div><div style="min-width:0"><div class="t1">${it.name}</div><div class="t2">${it.ds}</div></div></div></div>`;
+        <div class="ic">${em}</div><div style="min-width:0"><div class="t1">${it.name}</div><div class="t2">${it.ds}</div>${recs?`<div class="recs">${recs}</div><div class="more">${it.type==='stay'?'주소·연락처·요금·야놀자 링크':'주소·연락처·메뉴·영업시간'} 보기 →</div>`:''}</div></div></div>`;
   });
   h += '</div>';
   if((d.near||[]).length){
@@ -862,14 +937,31 @@ function openPlace(it, dayIdx){
   $('mk').innerHTML = `${kind} · <span style="color:${d.color}">${dayIdx+1}일차 ${d.date}</span>`;
   $('mt').textContent = it.name;
   const q = it.q || it.name;
+  const recs = RECS[it.rk]||[];
   $('mb').innerHTML = `<div class="mcontent" style="padding-top:16px">
       <div class="mrow"><span class="k">시간</span><span class="v">${it.t}</span></div>
       <div class="mrow"><span class="k">안내</span><span class="v">${it.ds}</span></div>
     </div>
-    <div class="mbtns">${mapLinks(q)}</div>
-    <div class="credit">${it.type==='stay'?'숙소는 다음 날 첫 일정과의 거리를 기준으로 고른 거점입니다. 지도 앱에서 주변 숙소를 검색해 예약하세요.':'영업시간·휴무·브레이크타임은 방문 전 지도 앱이나 전화로 확인하세요.'}</div>`;
+    ${recs.length ? recHtml(recs, it.type) : `<div class="mbtns">${mapLinks(q)}</div>`}
+    <div class="credit">${it.type==='stay'
+      ? '숙소는 다음 날 첫 일정과의 거리를 기준으로 드라이브인·무인텔·신축 순으로 골랐습니다. 요금은 야놀자 검색 화면 최저가(10/23 조회)라 날짜·인원·잔여 객실에 따라 달라질 수 있으니 예약 전 앱에서 확인하세요.'
+      : '한식·1인 주문 가능 메뉴 위주로 리뷰 평점 순서입니다(10/23 조사). 영업시간·휴무·1인 주문 가능 여부는 방문 전 전화로 확인하세요.'}</div>`;
   MODAL.classList.add('open'); document.body.style.overflow = 'hidden';
   if(HAS_MAP && it.coord) MV.fly(it.coord);
+}
+function recShort(r){ return r.price ? r.price.split(' (')[0] : r.menu.split(' · ')[0]; }
+function recHtml(list, type){
+  const row = (k,v)=> v ? `<div class="mrow"><span class="k">${k}</span><span class="v">${v}</span></div>` : '';
+  const tel = t => t ? t.split(' / ').map(x=>`<a href="tel:${x.replace(/\(.*\)/,'').replace(/[^0-9]/g,'')}">${x}</a>`).join(' · ') : '확인 불가 (예약 앱에서 확인)';
+  return list.map((r,i)=>`<div class="rec">
+    <div class="rh"><span class="rn">${i+1}</span><b>${r.name}</b><span class="rk">${r.kind}</span></div>
+    <div class="mcontent">
+      ${type==='stay' ? row('1박 요금', r.price) + row('평점', r.rating) + row('신축·리모델링', r.built) + row('다음날 출발', r.dist)
+                      : row('1인 메뉴', r.menu) + row('영업시간', r.hours) + row('평점', r.rating)}
+      ${row('주소', r.addr)}${row('연락처', tel(r.tel))}${row('추천 이유', r.why)}${r.warn ? row('확인 필요', `<span class="warn">${r.warn}</span>`) : ''}
+    </div>
+    <div class="mbtns"><a class="mbtn go" href="${r.url}" target="_blank" rel="noopener">${type==='stay'?'야놀자에서 예약':'리뷰·메뉴 보기'}</a>${mapLinks(r.q || r.name)}</div>
+  </div>`).join('');
 }
 function bindGallery(){
   const tr = $('gtrack'); if(!tr) return;
