@@ -160,6 +160,8 @@ if(typeof L === 'undefined'){
   .kterrain{ position:absolute; top:42px; right:4px; z-index:10; background:#fff; color:#333; border:1px solid #c8c8c8; border-radius:3px; font-size:12px; font-weight:700; padding:5px 8px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.15); }
   .kterrain.on{ background:#2a6ff0; color:#fff; border-color:#2a6ff0; }
   .mk.poi{ width:22px; height:22px; font-size:11px; border-width:2px; }
+  .mk.poi.rec{ width:24px; height:24px; font-size:12px; position:relative; } .mk.poi.rec.on{ width:28px; height:28px; font-size:14px; box-shadow:0 0 0 3px #ffd166; }
+  .mk.poi.rec b{ position:absolute; right:-7px; top:-7px; min-width:15px; height:15px; padding:0 2px; border-radius:8px; background:#fff; color:#111; font-size:10px; font-weight:900; line-height:15px; text-align:center; }
   .leaflet-tooltip.lbl{ background:rgba(14,20,32,.92); color:#fff; border:1px solid #3a4a68; border-radius:7px; font-size:11.5px; font-weight:700; padding:3px 7px; box-shadow:none; font-family:inherit; }
   .leaflet-tooltip.lbl.gen{ color:#fff; background:rgba(120,14,62,.94); border:1px solid #ff2e88; font-weight:700; }
   .leaflet-tooltip.lbl::before{ display:none; }
@@ -939,6 +941,7 @@ function drawMap(){
           tip:`${n}. ${s.name.replace(/^\S+\s/,'')}`, perm:true, click:()=>{ focusItem(ii); openSpot(it.key, curDay); }});
         bounds.push(s.coord);
       } else if(it.coord && (it.type==='meal'||it.type==='stay'||it.type==='opt'||it.type==='market'||it.type==='start'||it.type==='end')){
+        if((it.type==='meal' || it.type==='stay') && recMarkers(curDay, it, ii, null)) return;
         const em = {meal:'🍽', stay:'🏨', opt:'✨', market:'🏪', start:'🚗', end:'🏁'}[it.type];
         const bg = {meal:'#6b5413', stay:'#7a2e4a', opt:'#3b4a6b', market:'#2f6b45', start:'#0e1420', end:'#0e1420'}[it.type];
         MV.marker(it.coord,{...circ(`<div class="mk poi" style="background:${bg}">${em}</div>`,22,300),
@@ -1208,6 +1211,30 @@ function dayLines(di, weight, opacity, bounds){
   MV.line(pts,{color, weight, opacity, dash:true}); pts.forEach(c=>bounds.push(c));
   if(!res) computeDay(di).then(()=>{ if(curDay===-1 || curDay===di) drawMap(); });
 }
+/* 일차 지도: 추천 식당(🍽)·숙소(🏨)를 각각 실제 위치에 1·2·3 번호로 · 고른 곳은 강조
+   (좌표가 하나도 없으면 false → 원래처럼 일정 자리에 아이콘 하나) */
+function recMarkers(di, it, ii, pick){
+  const list = RECS[it.rk] || []; if(!list.length) return false;
+  const stay = it.type==='stay', em = stay ? '🏨' : '🍽', bg = stay ? '#7a2e4a' : '#6b5413';
+  const label = stay ? '숙박' : it.name.split(' · ')[0];
+  let drawn = 0;
+  list.forEach((r,ri)=>{
+    const c = r.c || GEO[r.name]; if(!c) return;
+    const on = pick===ri; drawn++;
+    MV.marker(c, { ...circ(`<div class="mk poi rec${on ? ' on' : ''}" style="background:${bg}">${em}<b>${ri+1}</b></div>`, on ? 28 : 24, on ? 650 : 350),
+      tip:`${label} 추천 ${ri+1} · ${esc(r.name)}${on ? ' (선택)' : ''}`, perm:on, click:()=>{ if(ii!=null) focusItem(ii); openRec(di, it, ri); } });
+  });
+  return drawn > 0;
+}
+function openRec(di, it, ri){
+  const r = (RECS[it.rk]||[])[ri]; if(!r) return;
+  const d = DAYS[di];
+  $('mk').innerHTML = `${it.type==='stay' ? '🏨 숙박 추천' : '🍽 식당 추천'} ${ri+1} · <span style="color:${d.color}">${di+1}일차 ${d.date}</span>`;
+  $('mt').textContent = r.name;
+  $('mb').innerHTML = `<div class="mcontent" style="padding-top:12px"><div class="mrow"><span class="k">일정</span><span class="v">${esc(it.name)}${it.t && /\d/.test(it.t) ? ' · '+esc(it.t) : ''}</span></div></div>${recHtml([r], it.type)}`;
+  MODAL.classList.add('open'); document.body.style.overflow = 'hidden';
+  const c = r.c || GEO[r.name]; if(HAS_MAP && c) MV.fly(c);
+}
 function drawCustom(di, bounds){
   const d = DAYS[di], res = resFor(di);
   const infos = res ? res.list : stopsOf(di).map(s=>stopInfo(di, s));
@@ -1222,6 +1249,7 @@ function drawCustom(di, bounds){
     } else if(x.kind==='gen'){
       n++; MV.marker(x.coord,{ html:`<div class="pin-gen">${GEN_PIN_SVG}</div>`, w:30, h:40, ax:15, ay:39, z:750, tip:`${n}. ${x.name} · 추가`, perm:true, dir:'bottom', cls:'gen', click });
     } else {
+      if((x.kind==='meal' || x.kind==='stay') && x.it && x.it.rk && recMarkers(di, x.it, null, x.rec ? (RECS[x.it.rk]||[]).indexOf(x.rec) : null)) return;
       const em = {meal:'🍽', stay:'🏨', opt:'✨', market:'🏪', start:'🚗', end:'🏁'}[x.kind];
       const bg = {meal:'#6b5413', stay:'#7a2e4a', opt:'#3b4a6b', market:'#2f6b45', start:'#0e1420', end:'#0e1420'}[x.kind];
       MV.marker(x.coord,{...circ(`<div class="mk poi" style="background:${bg}">${em}</div>`,22,300), tip:`${at}${x.name}`, perm:x.kind==='stay', click});
@@ -1797,6 +1825,7 @@ function drawActLayer(bounds){
     }
     A.forEach((s,j)=>{
       bounds.push(s.c);
+      if(curDay===-1 && (s.cat==='meal' || s.cat==='stay')) return;   /* 전체 지도에는 식당·숙소 표시 안 함 */
       MV.marker(s.c, { ...circ(`<div class="mk" style="background:#2f9e5b;box-shadow:0 0 0 2px #0b2a18">${curDay===-1 ? di+1 : j+1}</div>`, curDay===-1 ? 22 : 26, 900),
         tip:`✅ ${curDay===-1 ? (di+1)+'일차 · ' : ''}${s.cat==='stay' ? '숙박' : s.at} ${esc(s.name)}`, perm: curDay!==-1 && MAPV==='act', click:()=>openActStop(di, j) });
     });
@@ -2050,7 +2079,7 @@ function geocodeRecs(K){
   const done = ()=>{
     if(--left > 0 || !changed) return;
     LS.set(K_GEO, GEO); Object.keys(RES).forEach(k=>delete RES[k]);
-    if(PLAN.days.some(Boolean)) refresh();
+    refresh();   /* 좌표를 찾은 추천 식당·숙소를 지도에 바로 표시 */
   };
   todo.forEach(({r, fb})=>{
     const set = (y, x)=>{ const c = [+y, +x]; if(hav(c, fb) < 40){ GEO[r.name] = c; changed++; } };
