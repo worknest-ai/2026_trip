@@ -300,6 +300,67 @@ if(typeof L === 'undefined'){
     .sumgrid{ grid-template-columns:repeat(2,1fr); }
     .mrow{ grid-template-columns:78px 1fr; }
   }
+
+  /* 설명 문구 글자 크기 키움 (PC +1~1.5px) */
+  .p-sub{ font-size:14.5px; }
+  .chip{ font-size:12.5px; }
+  .sect{ font-size:13px; }
+  .it .tm{ font-size:14px; }
+  .meta{ font-size:13px; }
+  .ds{ font-size:14px; }
+  .shift, .ok{ font-size:13.5px; }
+  .more{ font-size:12.5px; }
+  .card.drive .d1{ font-size:13.5px; }
+  .card.drive .d2{ font-size:13px; }
+  .card .t1, .card.stop .t1{ font-size:14.5px; }
+  .card .t2, .card.stop .t2{ font-size:13.5px; }
+  .near .t1{ font-size:14px; }
+  .near .t2{ font-size:13px; }
+  .tip, .warn{ font-size:14px; }
+  .verdict p{ font-size:14px; }
+  .slot{ font-size:13.5px; }
+  .daycard .dn{ font-size:13px; }
+  .daycard .dm{ font-size:13.5px; }
+  ul.check li{ font-size:14px; }
+  .mrow{ font-size:14.5px; }
+  .mrow .k{ font-size:13px; }
+  .recs .rc{ font-size:13.5px; }
+  .rec .rh{ font-size:15px; }
+  .credit{ font-size:12.5px; }
+  .calc, .lateN{ font-size:13.5px; }
+
+  /* 모바일은 원래 크기보다 +2px */
+  @media (max-width: 999px){
+    .p-sub{ font-size:15px; }
+    .chip{ font-size:13.5px; }
+    .sect{ font-size:14px; }
+    .it .tm{ font-size:14px; }
+    .meta{ font-size:14px; }
+    .ds{ font-size:14.5px; }
+    .shift, .ok{ font-size:14px; }
+    .more{ font-size:13.5px; }
+    .card.drive .d1{ font-size:14.5px; }
+    .card.drive .d2{ font-size:13.5px; }
+    .card .t1, .card.stop .t1{ font-size:15.5px; }
+    .card .t2, .card.stop .t2{ font-size:14px; }
+    .near .t1{ font-size:15px; }
+    .near .t2{ font-size:13.5px; }
+    .tip, .warn{ font-size:14.5px; }
+    .verdict p{ font-size:14.8px; }
+    .slot{ font-size:14px; }
+    .daycard .dn{ font-size:14px; }
+    .daycard .dm{ font-size:14px; }
+    ul.check li{ font-size:14.5px; }
+    .mrow{ font-size:15px; }
+    .mrow .k{ font-size:14px; }
+    .recs .rc{ font-size:14px; }
+    .rec .rh{ font-size:16px; }
+    .credit{ font-size:13px; }
+    .calc, .lateN{ font-size:14px; }
+  }
+  @media (max-width: 420px){
+    .it{ grid-template-columns:52px 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -504,7 +565,7 @@ const DAYS = [
       shift:{to:'오전 11:40~오후 12:30', why:'10시에 경기 광주에서 출발하니 일출 물안개 시간은 쓸 수 없습니다. 대신 해가 높이 뜬 한낮엔 노란 은행잎이 가장 선명하고, 바람이 잔잔하면 저수지에 은행나무 반영도 남아 있어요. 은행나무길과 둘레길은 상시 개방(무료)이라 관람시간 제약이 없습니다. 오늘 일정이 길어 50분 정도로 짧게 걷습니다.'}},
     {type:'drive', text:'문광저수지 → 괴산읍', d:'7km · 약 10분'},
     {type:'meal', t:'12:40', name:'점심 · 괴산읍 칼국수·설렁탕', ds:'괴산읍 식당을 카카오맵 후기 많은 순으로 골라, 10/26(월) 12:40에 영업 중인 곳만 남겼어요. 후기가 가장 많은 올갱이국집(맛식당)은 월요일 휴무라 뺐습니다.', coord:[36.8104,127.7928], q:'괴산읍 맛집', rk:'m1l'},
-    {type:'drive', text:'괴산읍 → 단양 보발재 전망대', d:'100km · 약 2시간'},
+    {type:'market', t:'12:40', name:'전통시장 · 괴산전통시장', ds:'점심 자리 바로 옆 재래시장(오일장)이에요. 점심을 시장 안·옆 식당에서 먹고 한 바퀴 둘러봐도 되고, 따로 시간을 더 잡지 않았어요. 장날이 아니면 한산할 수 있어요(장날은 확인하지 못했어요).', coord:[36.81107,127.79417], q:'괴산전통시장', rk:'k1', mhours:'카카오맵 영업시간 미등록 · 오일장', park:{name:'괴산군전통시장주차장 (공영)', addr:'충북 괴산군 괴산읍 읍내로15길 8-8 (동부리 510)', c:[36.81117,127.79512], walk:'시장까지 약 85m', alt:'제2전통시장주차장 · 읍내로15길 7-7 (약 70m)'}, info:'https://place.map.kakao.com/25618555', photo:'http://t1.kakaocdn.net/local/kakaomapPhoto/review/85a158789c3f8feb9eadbe2c2173060fd8ffcdeb?original'},    {type:'drive', text:'괴산읍 → 단양 보발재 전망대', d:'100km · 약 2시간'},
     {type:'spot', key:'bobaljae', t:'15:20', t2:'15:45',
       shift:{to:'오후 3:20~3:45', why:'첫날이라 괴산에서 넘어오면 오후가 됩니다. 도로변 전망대라 시간 제한이 없고, 오후 해가 서쪽에서 비스듬히 들어와 S자 단풍길이 역광으로 붉게 빛나요. 부석사 노을을 지키려면 <b>15:50에는 출발</b>하세요.'}},
     {type:'drive', text:'보발재 → 영주 부석사 (영부로 · 935번 지방도)', d:'37km · 약 55분 · 고개를 넘는 굽은 산길이니 서행하세요. 단양읍으로 되돌아가는 길(약 75km · 1시간 40분)로 가면 노을을 놓칩니다'},
@@ -537,7 +598,7 @@ const DAYS = [
       shift:{to:'오후 4:40~5:30', why:'원래 추천은 오전 7:30~10시지만 10시 출발 일정에선 오전을 주산지가 차지합니다. 늦은 오후의 낮은 해가 은행잎을 뒤에서 비추면(역광) 숲 전체가 금빛으로 빛나 오전과는 다른 그림이 나와요. 마을 숲이라 관람시간 제한은 없지만 일몰(17:36) 뒤엔 금방 어두워지니 17:30에는 차로 돌아오세요.'}},
     {type:'drive', text:'도리마을 → 울주 언양', d:'53km · 약 55분'},
     {type:'meal', t:'18:25', name:'저녁 · 언양불고기·국밥', ds:'언양읍 식당을 카카오맵 후기 많은 순으로 골라, 10/27(화) 저녁에 영업 중인 곳만 남겼어요. 불고기집은 라스트오더가 20:00이고, 국밥집은 22:00까지 해요. 언양밀면은 화요일 휴무라 뺐습니다.', coord:[35.5708,129.1179], q:'언양불고기', rk:'m2d'},
-    {type:'drive', text:'언양읍 → 등억온천단지 숙소', d:'7km · 약 10분'},
+    {type:'market', t:'18:25', name:'전통시장 · 언양알프스시장', ds:'저녁 자리(언양읍) 안의 1915년 개장 재래시장이에요. 10/27은 장날(2·7일)이지만 시장 영업이 19:00까지라 도착하면 곧 문을 닫아요. 시장 안 곰탕집(라스트오더 19:30)도 저녁 대안으로 넣었어요.', coord:[35.56370,129.12529], q:'언양알프스시장', rk:'k2', mhours:'화 08:00~19:00 · 장날 2·7일 (10/27 장날)', park:{name:'언양강변공영주차장', addr:'울산 울주군 언양읍 남부리 336-1', c:[35.56222,129.12487], walk:'시장까지 약 170m'}, info:'https://place.map.kakao.com/27485292', info2:'https://www.ktriptips.com/kor/shopping/1437568', photo:'http://t1.kakaocdn.net/mystore/D38C870FC10F4F5E8B517296D9A71529'},    {type:'drive', text:'언양읍 → 등억온천단지 숙소', d:'7km · 약 10분'},
     {type:'stay', t:'숙박', name:'언양 등억온천단지 무인텔', ds:'19:30경 도착. 무인 체크인·1실 1주차·드라이브인 숙소를 우선했어요. 5년 이내 신축이 필요하면 4순위 브라운도트 언양점(2024년 5월 오픈, 드라이브인 아님)을 고르세요. 내일 첫 일정인 통도사까지 약 20분. 내일 황매산 노을 하산용 헤드랜턴을 미리 확인해 두세요.', coord:[35.5536,129.0755], q:'등억온천 무인텔', rk:'s2'}
   ],
   near:[
@@ -557,12 +618,12 @@ const DAYS = [
     {type:'opt', t:'11:15', name:'밀양댐 생태공원 (사진 정차)', ds:'배내골 단풍길 끝, 밀양호와 단풍 산자락이 한눈에 보이는 곳. 15분 정도 쉬었다가 밀양 시내로 내려갑니다.', coord:[35.4857,128.9314]},
     {type:'drive', fall:true, text:'밀양댐 → 단장면 → 밀양 시내 (1051·1077번 지방도)', d:'25km · 약 35분 · 단장천 계곡을 따라 내려가는 길'},
     {type:'meal', t:'12:05', name:'점심 · 밀양 추어탕·국밥·칼국수', ds:'밀양 시내 식당을 카카오맵 후기 많은 순으로 골라, 10/28(수) 점심에 영업 중인 한식집만 남겼어요.', coord:[35.4993,128.7462], q:'밀양 맛집', rk:'m3l'},
-    {type:'opt', t:'12:55', name:'(선택) 밀양 영남루', ds:'밀양강 절벽 위의 조선시대 누각(국보). 점심 식당에서 차로 5분, 영남루 공영주차장에 세우고 20~30분 둘러봅니다. 늦어지면 건너뛰세요.', coord:[35.4916,128.7551]},
+    {type:'market', t:'12:05', name:'전통시장 · 밀양아리랑시장', ds:'점심 자리 근처, 영남루 바로 아래에 있는 밀양 대표 재래시장이에요. 시장 안 장터국밥집에서 점심을 먹어도 되고, 영남루와 묶어 걸어서 둘러보기 좋아요.', coord:[35.49302,128.75256], q:'밀양아리랑시장', rk:'k3l', mhours:'카카오맵 영업시간 미등록', park:{name:'밀양내일전통시장 주차장', addr:'경남 밀양시 내일동 174-2', c:[35.49348,128.75301], walk:'시장까지 약 65m', alt:'영남루공영노외주차장 · 내일동 57 (약 170m, 영남루 바로 앞)'}, info:'https://place.map.kakao.com/12490521', photo:'https://postfiles.pstatic.net/MjAyNjEwMTlfNDkg/MDAxNzkyNDAzMzY3OTQ2.7ZVnjtgIlG7XpoTWt5ZZZXHtKOJ13_P7iuJ7Dz38FSgg.z90CaZOAaSZdxo6_IVAo8AQQVc67RrHMesrNXSutFgYg.JPEG/900_20261010_124242.jpg?type=w773'},    {type:'opt', t:'12:55', name:'(선택) 밀양 영남루', ds:'밀양강 절벽 위의 조선시대 누각(국보). 점심 식당에서 차로 5분, 영남루 공영주차장에 세우고 20~30분 둘러봅니다. 늦어지면 건너뛰세요.', coord:[35.4916,128.7551]},
     {type:'drive', text:'밀양 → 합천 황매산 정상주차장', d:'102km · 약 1시간 55분 · 정상주차장 진입로는 굽은 오르막 산길'},
     {type:'spot', key:'hwangmaesan', t:'15:20', t2:'18:00', ok:'원래 추천(오후 3시~일몰) 그대로 배정. 억새가 금빛으로 빛나는 늦은 오후부터 <b>일몰(17:42경)</b>까지 억새평전에 머물고, 17:45에 내려오기 시작해 18:00쯤 주차장에 닿습니다. 정상주차장(해발 약 850m)에서 억새 군락까지 걸어서 10분이라 해가 진 뒤에도 하산이 짧아요. 군립공원은 상시 개방(기상 악화 시 통제)이고, 하늘계단·황매산성 쪽은 일몰 전에 미리 다녀오세요.'},
     {type:'drive', text:'황매산 → 합천읍', d:'28km · 약 40분 · 해가 진 뒤 내려가는 굽은 산길이니 서행하세요'},
     {type:'meal', t:'18:40', name:'저녁 · 합천읍 국밥·고기', ds:'창녕 가는 길의 합천읍(군청 소재지)에서 먹습니다. 카카오맵 후기 많은 순으로 골라, 10/28(수) 18:40 이후에도 영업하는 곳만 남겼어요(세 곳 모두 21:00까지).', coord:[35.5686,128.1607], q:'합천읍 맛집', rk:'m3d'},
-    {type:'drive', text:'합천읍 → 창녕 숙소 (야간)', d:'38km · 약 45분'},
+    {type:'market', t:'18:40', name:'전통시장 · 합천왕후시장', ds:'저녁 자리(은성순대국밥) 바로 앞 재래시장이에요. 수요일엔 20:00까지 열어 저녁 먹으면서 잠깐 둘러볼 수 있어요. 10/28이 장날일 수 있지만(8일 장날 기사) 확정은 못 했어요.', coord:[35.56832,128.16041], q:'합천왕후시장', rk:'k3d', mhours:'수 08:00~20:00', park:{name:'합천왕후시장 공영주차장', addr:'경남 합천군 합천읍 합천리 473-7', c:[35.56802,128.16050], walk:'시장까지 약 35m'}, info:'https://place.map.kakao.com/10928965', photo:'http://t1.kakaocdn.net/local/kakaomapPhoto/review/655ec347128a4c38babe846073ebcc7bae648702?original'},    {type:'drive', text:'합천읍 → 창녕 숙소 (야간)', d:'38km · 약 45분'},
     {type:'stay', t:'숙박', name:'창녕 드라이브인 무인텔', ds:'20:20경 도착. 1순위 스위트호텔은 야놀자 소개에 "1실1주차드라이브인"이 명시된 곳이에요(계성면, 우포늪까지 약 22분). 2~4순위는 우포늪 옆 대지면 무인텔(약 15분)입니다.', coord:[35.5710,128.4731], q:'창녕 무인텔', rk:'s3'}
   ],
   near:[
@@ -583,7 +644,7 @@ const DAYS = [
       shift:{to:'오전 10:15~11:15', why:'원래 추천은 일출 무렵이지만 10시 출발 일정에선 새벽을 쓸 수 없습니다. 오전엔 물안개 대신 맑은 하늘 아래 갈대와 왕버들, 대대제방 너머 넓은 습지가 시원하게 보여요. 우포늪생태관은 09:00~18:00(월요일 휴관)이라 목요일 이 시간엔 문제없고, 귀갓길 단풍길 두 곳을 넣느라 생태관 → 전망대 → 대대제방 짧은 코스(1시간)만 돕니다.'}},
     {type:'drive', text:'우포늪 → 대구 달성 현풍읍', d:'27km · 약 30분 (귀갓길 중부내륙고속도로 현풍IC 근처)'},
     {type:'meal', t:'11:45', name:'점심 · 대구 현풍 생선구이·추어탕·국밥', ds:'현풍읍(테크노폴리스 포함) 식당을 카카오맵 후기 많은 순으로 골라, 10/29(목) 점심에 영업 중인 한식집만 남겼어요.', coord:[35.6968,128.4467], q:'현풍 맛집', rk:'m4l'},
-    {type:'drive', fall:true, text:'현풍 → 중부내륙고속도로 → 문경새재IC → 이화령 옛길 (3번 국도 옛길 · 이화령로)', d:'146km · 약 2시간 10분 · 내비 경유지에 "이화령휴게소"를 넣으면 문경새재IC에서 내려 고개 옛길로 안내해요. 마지막 약 10km가 백두대간 고개를 넘는 단풍 구간'},
+    {type:'market', t:'11:45', name:'전통시장 · 현풍백년도깨비시장', ds:'점심 자리(현풍읍) 안의 1918년 개장 재래시장이에요. 시장 안 소구레(수구레)국밥집에서 점심을 먹어도 되고, 추가 시간은 잡지 않았어요. 10/29는 장날이 아니에요(5·10일).', coord:[35.69471,128.44224], q:'현풍백년도깨비시장', rk:'k4', mhours:'목 10:00~19:00 · 장날 5·10일', park:{name:'현풍백년도깨비시장 공영주차장', addr:'대구 달성군 현풍읍 현풍로6길 5 (원교리 12-5)', c:[35.69477,128.44223], walk:'시장 건물 바로 앞'}, info:'https://place.map.kakao.com/25043990', info2:'https://www.ktriptips.com/kor/shopping/1435275', photo:'https://postfiles.pstatic.net/MjAyNjEwMjNfMTk4/MDAxNzkyNzU2NDk2MTA5.MLoMMSaSYImZdxrInvNXG2HoIOb0_tqGk39hh12RHSYg.LAZI3tm44PVfPLUBGxjASblGS82DZX2lT2dpucNtOAEg.JPEG/900%EF%BC%BF20261023%EF%BC%BF184939.jpg?type=w580'},    {type:'drive', fall:true, text:'현풍 → 중부내륙고속도로 → 문경새재IC → 이화령 옛길 (3번 국도 옛길 · 이화령로)', d:'146km · 약 2시간 10분 · 내비 경유지에 "이화령휴게소"를 넣으면 문경새재IC에서 내려 고개 옛길로 안내해요. 마지막 약 10km가 백두대간 고개를 넘는 단풍 구간'},
     {type:'opt', t:'14:40', name:'이화령 고개 (사진·휴식)', ds:'경북 문경과 충북 괴산 경계의 백두대간 고개. 고갯마루 휴게소에 차를 세우고 10분쯤 쉬면서 단풍 능선을 봅니다. 고속도로 휴게소 대신 여기서 쉬어 가세요.', coord:[36.7514,128.0316]},
     {type:'drive', fall:true, text:'단풍 드라이브 · 이화령 → 연풍 → 수안보 → 미륵리 → 월악산 송계계곡 (3번 국도 · 미륵송계로)', d:'31km · 약 45분 · 내비 경유지에 "미륵대원지", "송계계곡"을 차례로 넣으세요. 미륵리부터 월악산 국립공원 안 송계계곡을 따라 약 15km 단풍길이 이어져요'},
     {type:'opt', t:'15:35', name:'월악산 송계계곡 (사진 정차)', ds:'월악산 자락 계곡을 따라 이어지는 단풍길 중간. 덕주사 입구 근처 갓길·주차장에 잠깐 세워 10분 정도 계곡 단풍을 봅니다. 국립공원 안이라 지정된 곳에만 주차하세요.', coord:[36.8653,128.0880]},
@@ -637,6 +698,34 @@ const RECS = {
     {name:'바다생선구이', kind:'생선구이·조림', menu:'갈치구이(1인분) 14,000원 · 서대구이(1인분) 11,000원 · 갈치조림(1인분) 15,000원', hours:'목 06:00~21:00 (라스트오더 20:30)', rating:'카카오 ★4.8 · 후기 5 · 블로그 318', addr:'대구 달성군 현풍읍 비슬로134길 135 1층', tel:'053-611-3297', url:KP(19511748), c:[35.69684,128.44667], why:'현풍 한식 중 후기 합계 1위 · 메뉴가 1인분 단위', q:'현풍 바다생선구이'},
     {name:'이로정', kind:'추어탕', menu:'추어탕 10,000원 · 고등어 상황 추어정식 18,000원', hours:'목 11:00~21:00 (브레이크 15:30~17:00)', rating:'카카오 ★4.9 · 후기 11 · 블로그 220', addr:'대구 달성군 현풍읍 비슬로 582 1층', tel:'053-616-0077', url:KP(315520827), c:[35.69116,128.44522], why:'평점이 가장 높음 · 추어탕 한 그릇', warn:'온수육 추어정식은 2인 이상', q:'현풍 이로정'},
     {name:'엄박사한우가마솥국밥 대구현풍본점', kind:'한우국밥', menu:'한우국밥(소머리·살코기) 12,000원 · 뚝배기 소불고기 12,000원', hours:'목 08:00~21:00', rating:'카카오 ★4.5 · 후기 19 · 블로그 206', addr:'대구 달성군 현풍읍 비슬로 727 1층', tel:'0502-5553-2420', url:KP(637043040), c:[35.70139,128.43899], why:'가마솥 한우국밥 · 한 그릇 메뉴', q:'엄박사한우가마솥국밥 현풍'}
+  ],
+  /* 전통시장 안·옆 식당 (카카오맵 후기 순, 여행 당일 영업 확인 · 10/25 조회) */
+  k1:[
+    {name:'시원해물칼국수', kind:'해물칼국수 · 시장 옆', menu:'바지락해물칼국수 8,000원', hours:'월 10:00~20:00', rating:'카카오 ★4.5 · 후기 34 · 블로그 36', addr:'충북 괴산군 괴산읍 읍내로12길 27 1층', tel:'043-832-4822', url:KP(126402736), c:[36.81041,127.79283], why:'괴산시장 주변 후기 1위 · 칼국수 1인 주문 가능', q:'괴산 시원해물칼국수'},
+    {name:'은자네동태탕생선구이', kind:'동태탕·생선구이', menu:'동태탕(1인분) 11,000원 · 고등어구이 14,000원', hours:'월 10:30~20:30', rating:'카카오 ★4.9 · 후기 16 · 블로그 8', addr:'충북 괴산군 괴산읍 괴강로 19 1층', tel:'043-832-5562', url:KP(441263674), c:[36.80959,127.79658], why:'평점이 가장 높음 · 1인분 메뉴', q:'괴산 은자네동태탕생선구이'},
+    {name:'상록숯불갈비', kind:'숯불갈비·찌개', menu:'김치찌개(1인분) 8,000원 · 된장찌개(1인분) 8,000원', hours:'월 11:00~21:00', rating:'카카오 ★4.6 · 후기 12 · 블로그 1', addr:'충북 괴산군 괴산읍 읍내로16길 3-8', tel:'043-833-1084', url:KP(24005478), c:[36.81053,127.79622], why:'시장 바로 옆 · 점심 찌개 1인분', q:'괴산 상록숯불갈비'}
+  ],
+  k2:[
+    {name:'공원불고기', kind:'언양불고기 · 시장 옆 200m', menu:'석쇠불고기(1인분) 21,000원 + 된장찌개 2,000원', hours:'화 10:00~21:00 (라스트오더 20:00)', rating:'카카오 ★4.7 · 후기 289 · 블로그 116', addr:'울산 울주군 언양읍 헌양길 32 1층', tel:'052-262-0421', url:KP(8667831), c:[35.56518,129.12548], why:'시장 주변 후기 1위 · 메뉴가 1인분 단위', q:'언양 공원불고기'},
+    {name:'시장곰탕', kind:'소머리곰탕', menu:'소머리곰탕 11,000원 · 선지국 10,000원', hours:'화 07:30~20:00 (라스트오더 19:30)', rating:'카카오 ★4.5 · 후기 33 · 블로그 53', addr:'울산 울주군 언양읍 동문길 97-13 1층', tel:'010-7334-0275', url:KP(76221796), c:[35.56318,129.12543], why:'알프스시장 안 곰탕집 · 한 그릇 메뉴', q:'언양 시장곰탕'},
+    {name:'청기와곰탕', kind:'한우곰탕', menu:'한우곰탕 11,000원 · 한우곰탕(특) 14,000원', hours:'화 08:00~20:00 (라스트오더 19:30)', rating:'카카오 ★4.3 · 후기 12 · 블로그 59', addr:'울산 울주군 언양읍 장터2길 11-3 1층', tel:'052-262-9403', url:KP(21378679), c:[35.56309,129.12600], why:'장터길 안 곰탕집', q:'언양 청기와곰탕'},
+    {name:'백마식당', kind:'국밥·찌개', menu:'소갈비국밥 10,000원 · 차돌된장찌개 10,000원', hours:'화 06:00~21:30 (브레이크 16:00~17:00)', rating:'카카오 ★4.8 · 후기 8 · 블로그 88', addr:'울산 울주군 언양읍 동부8길 20-1 1층', tel:'052-264-1115', url:KP(1427816889), c:[35.56505,129.12615], why:'21:30까지 영업 · 한 그릇 메뉴', q:'언양 백마식당'}
+  ],
+  k3l:[
+    {name:'따숭거국밥', kind:'장터국밥 · 상설시장 안', menu:'약탕기 보약국밥 12,000원 · 장터국밥(순대·돼지) 10,000원', hours:'수 10:00~16:00', rating:'카카오 ★4.9 · 후기 7 · 블로그 114', addr:'경남 밀양시 상설시장1길 17-12 1층', tel:'055-353-8848', url:KP(1273934289), c:[35.49280,128.75351], why:'시장 안 식당 중 블로그 후기 1위', q:'밀양 따숭거국밥'},
+    {name:'영남당', kind:'한식 · 시장 상가', menu:'한우미역국+떡갈비 정식 11,000원 · 산채비빔밥 9,000원', hours:'수 11:00~20:00 (브레이크 15:00~16:30)', rating:'카카오 ★4.5 · 후기 4 · 블로그 113', addr:'경남 밀양시 내일상가2길 2', tel:'', url:KP(2147305894), c:[35.49178,128.75297], why:'1인 정식 · 영남루 가는 길', q:'밀양 영남당'},
+    {name:'아리랑돼지국밥', kind:'돼지국밥 · 상설시장 안', menu:'돼지국밥 7,000원', hours:'수 08:00~20:00', rating:'카카오 ★4.0 · 후기 7 · 블로그 13', addr:'경남 밀양시 상설시장1길 11 227~233호', tel:'010-8758-6337', url:KP(27230666), c:[35.49306,128.75256], why:'시장 안 국밥집 · 가장 저렴', q:'밀양 아리랑돼지국밥'},
+    {name:'밀양밀면맛집', kind:'밀면 · 시장 옆', menu:'밀면 8,000원 · 비빔밀면 9,000원', hours:'수 11:00~15:00', rating:'카카오 ★4.3 · 후기 18 · 블로그 37', addr:'경남 밀양시 남천강변로 49 1층', tel:'055-352-8892', url:KP(32465841), c:[35.49140,128.75207], why:'시장 옆 밀면집', q:'밀양밀면맛집'}
+  ],
+  k3d:[
+    {name:'은성순대국밥', kind:'순대국밥 · 시장 앞', menu:'순대국밥 10,000원 · 돼지국밥 9,000원 · 짜글이(1인) 13,000원', hours:'수 09:00~21:00', rating:'카카오 ★4.2 · 후기 21 · 블로그 52', addr:'경남 합천군 합천읍 옥산로 45', tel:'055-934-1555', url:KP(1241415279), c:[35.56861,128.16065], why:'시장 주변 후기 1위 · 1인 메뉴', q:'합천 은성순대국밥'},
+    {name:'중앙식육식당', kind:'식육식당', menu:'삼겹살구이 10,000원 · 목살구이 10,000원', hours:'수 11:00~21:00', rating:'카카오 ★4.1 · 후기 9 · 블로그 8', addr:'경남 합천군 합천읍 충효로 81 1층', tel:'055-931-2246', url:KP(9431788), c:[35.56763,128.16111], why:'시장 옆 정육식당', warn:'고기 1인분 주문 가능 여부는 전화로 확인', q:'합천 중앙식육식당'},
+    {name:'옥산식육식당', kind:'식육식당', menu:'삼겹살(170g) 9,000원 · 김치찌개 6,000원', hours:'수 09:00~21:30', rating:'카카오 ★5.0 · 후기 2 · 블로그 11', addr:'경남 합천군 합천읍 옥산로 43-9', tel:'', url:KP(9292645), c:[35.56901,128.15988], why:'21:30까지 영업 · 김치찌개 1인', q:'합천 옥산식육식당'}
+  ],
+  k4:[
+    {name:'원조이방아지매', kind:'소구레(수구레)국밥 · 시장 안', menu:'소구레국밥 8,000원 · 소구레국수 6,000원', hours:'목 07:00~19:00', rating:'카카오 ★4.2 · 후기 20 · 블로그 56', addr:'대구 달성군 현풍읍 현풍로6길 5 (현풍백년도깨비시장)', tel:'053-611-8153', url:KP(21529048), c:[35.69472,128.44223], why:'시장 안 식당 중 후기 1위 · 창녕 이방시장까지 가지 않아도 같은 수구레국밥', q:'현풍 원조이방아지매'},
+    {name:'십이리할매소구레집', kind:'소구레국밥 · 시장 안', menu:'소구레국밥 9,000원 · 선지국밥 9,000원 · 메밀묵밥 9,000원', hours:'목 08:30~18:00', rating:'카카오 ★4.5 · 후기 18 · 블로그 44', addr:'대구 달성군 현풍읍 현풍로6길 5 현풍시장 1층 108호', tel:'010-9356-5887', url:KP(21440316), c:[35.69460,128.44204], why:'평점이 가장 높은 소구레국밥집', q:'현풍 십이리할매소구레집'},
+    {name:'은하곰탕', kind:'곰탕 · 시장 안', menu:'곰탕(소) 8,000원 · 수육 20,000원', hours:'목 09:00~20:00', rating:'카카오 ★3.7 · 후기 3 · 블로그 21', addr:'대구 달성군 현풍읍 현풍로6길 5 현풍공설시장 111호', tel:'', url:KP(14757103), c:[35.69464,128.44222], why:'현풍 곰탕을 시장 안에서', q:'현풍 은하곰탕'}
   ],
   s1:[
     {name:'청송 S모텔', kind:'모텔 · 1실 1주차', price:'39,000원~ (야놀자 표시가, 10/25)', rating:'야놀자 4.4 (330)', built:'리모델링 (야놀자 소개 "New리모델링", 연도 미표기)', dist:'주산지까지 약 25분', addr:'경북 청송군 청송읍 휴양단지길 23', tel:'', url:Y(1019654), c:[36.44270,129.07147], why:'야놀자 소개에 "★1실1주차/편백룸/New리모델링" · 후기 요약 "주차가 편리" · 청송읍에서 드라이브인에 가장 가까움', warn:'객실 바로 아래 개별 차고인지는 숙소 사진으로 확인하세요'},
@@ -799,9 +888,9 @@ function drawMap(){
         MV.marker(s.coord,{...circ(`<div class="mk codex" style="background:${d.color}">${n}</div>`,28,800),
           tip:`${n}. ${s.name.replace(/^\S+\s/,'')}`, perm:true, click:()=>{ focusItem(ii); openSpot(it.key, curDay); }});
         bounds.push(s.coord);
-      } else if(it.coord && (it.type==='meal'||it.type==='stay'||it.type==='opt'||it.type==='start'||it.type==='end')){
-        const em = {meal:'🍽', stay:'🏨', opt:'✨', start:'🚗', end:'🏁'}[it.type];
-        const bg = {meal:'#6b5413', stay:'#7a2e4a', opt:'#3b4a6b', start:'#0e1420', end:'#0e1420'}[it.type];
+      } else if(it.coord && (it.type==='meal'||it.type==='stay'||it.type==='opt'||it.type==='market'||it.type==='start'||it.type==='end')){
+        const em = {meal:'🍽', stay:'🏨', opt:'✨', market:'🏪', start:'🚗', end:'🏁'}[it.type];
+        const bg = {meal:'#6b5413', stay:'#7a2e4a', opt:'#3b4a6b', market:'#2f6b45', start:'#0e1420', end:'#0e1420'}[it.type];
         MV.marker(it.coord,{...circ(`<div class="mk poi" style="background:${bg}">${em}</div>`,22,300),
           tip:`${it.t} ${it.name}`, click:()=>{ focusItem(ii); if(it.type!=='start' && it.type!=='end') openPlace(it, curDay); }});
       }
@@ -915,12 +1004,12 @@ function renderDay(){
           </div></div></div>`;
       return;
     }
-    const em = {start:'🚗', end:'🏁', meal:'🍽', stay:'🏨', opt:'✨'}[it.type];
-    const clickable = (it.type==='meal'||it.type==='stay'||it.type==='opt');
+    const em = {start:'🚗', end:'🏁', meal:'🍽', stay:'🏨', opt:'✨', market:'🏪'}[it.type];
+    const clickable = (it.type==='meal'||it.type==='stay'||it.type==='opt'||it.type==='market');
     const recs = (RECS[it.rk]||[]).map((r,ri)=>`<div class="rc"><b>${ri+1}</b>${r.name}${r.isNew?`<i class="newb">🆕 신축</i>`:''}<span>${recShort(r)}</span></div>`).join('');
     h += `<div class="it" id="it-${ii}"><div class="tm">${it.t==='숙박'?'<small>숙박</small>':it.t}</div>
       <div class="card small ${it.type}${clickable?' click':''}" ${clickable?`data-i="${ii}"`:''}>
-        <div class="ic">${em}</div><div style="min-width:0"><div class="t1">${it.name}</div><div class="t2">${it.ds}</div>${recs?`<div class="recs">${recs}</div><div class="more">${it.type==='stay'?'주소·연락처·요금·예약 링크':'주소·연락처·메뉴·영업시간'} 보기 →</div>`:''}</div></div></div>`;
+        <div class="ic">${em}</div><div style="min-width:0"><div class="t1">${it.name}</div><div class="t2">${it.ds}${it.park?`<br><b>🅿 ${it.park.name}</b> · ${it.park.addr} (${it.park.walk})`:''}</div>${recs?`<div class="recs">${recs}</div><div class="more">${it.type==='stay'?'주소·연락처·요금·예약 링크':(it.type==='market'?'주차장·시장 정보·사진·식당':'주소·연락처·메뉴·영업시간')} 보기 →</div>`:''}</div></div></div>`;
   });
   h += '</div>';
   if((d.near||[]).length){
@@ -955,8 +1044,8 @@ const LS = {
   set(k, v){ try{ if(v==null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
 const K_DRAFT = 'trip26.draft', K_SAVED = 'trip26.routes', K_GEO = 'trip26.geo', K_PANEL = 'trip26.panelW';
-/* PLAN_V 9: 4일차 송계계곡 단풍길 추가로 항목 번호가 바뀜 → 그 전에 저장한 편집은 기본 일정으로 되돌림 */
-const PLAN_V = 9;
+/* PLAN_V 10: 전통시장 항목(1~4일차) 추가로 항목 번호가 바뀜 → 그 전에 저장한 편집은 기본 일정으로 되돌림 */
+const PLAN_V = 10;
 const GEO = LS.get(K_GEO, {});
 const RES = {}, ROUTE_CACHE = {};
 let editMode = false;
@@ -965,7 +1054,7 @@ let PLAN = sanitizePlan(LS.get(K_DRAFT, null)) || blankPlan();
 function blankPlan(){ return { v:PLAN_V, id:null, name:'기본 일정', dirty:false, days:DAYS.map(()=>null) }; }
 function sanitizeDays(days, v = PLAN_V){
   if(!Array.isArray(days) || days.length !== DAYS.length) return null;
-  return days.map((st,di)=> Array.isArray(st) && !(v < 9) ? st.filter(s=> s && ((s.k==='b' && DAYS[di].items[s.i] && DAYS[di].items[s.i].type!=='drive') || (s.k==='g' && SPOTS[s.key]))) : null);
+  return days.map((st,di)=> Array.isArray(st) && !(v < 10) ? st.filter(s=> s && ((s.k==='b' && DAYS[di].items[s.i] && DAYS[di].items[s.i].type!=='drive') || (s.k==='g' && SPOTS[s.key]))) : null);
 }
 function sanitizePlan(p){ const days = p && sanitizeDays(p.days, p.v||1); return days ? { v:PLAN_V, id:p.id||null, name:p.name||'기본 일정', dirty:!!p.dirty, days } : null; }
 function touch(){ PLAN.dirty = true; LS.set(K_DRAFT, PLAN); }
@@ -1072,8 +1161,8 @@ function drawCustom(di, bounds){
     } else if(x.kind==='gen'){
       n++; MV.marker(x.coord,{ html:`<div class="pin-gen">${GEN_PIN_SVG}</div>`, w:30, h:40, ax:15, ay:39, z:750, tip:`${n}. ${x.name} · 추가`, perm:true, dir:'bottom', cls:'gen', click });
     } else {
-      const em = {meal:'🍽', stay:'🏨', opt:'✨', start:'🚗', end:'🏁'}[x.kind];
-      const bg = {meal:'#6b5413', stay:'#7a2e4a', opt:'#3b4a6b', start:'#0e1420', end:'#0e1420'}[x.kind];
+      const em = {meal:'🍽', stay:'🏨', opt:'✨', market:'🏪', start:'🚗', end:'🏁'}[x.kind];
+      const bg = {meal:'#6b5413', stay:'#7a2e4a', opt:'#3b4a6b', market:'#2f6b45', start:'#0e1420', end:'#0e1420'}[x.kind];
       MV.marker(x.coord,{...circ(`<div class="mk poi" style="background:${bg}">${em}</div>`,22,300), tip:`${at}${x.name}`, perm:x.kind==='stay', click});
     }
   });
@@ -1081,7 +1170,7 @@ function drawCustom(di, bounds){
 }
 function openStop(di, x){
   if(x.kind==='spot' || x.kind==='gen') openSpot(x.key, di);
-  else if(x.it && (x.kind==='meal' || x.kind==='stay' || x.kind==='opt')) openPlace(x.it, di);
+  else if(x.it && (x.kind==='meal' || x.kind==='stay' || x.kind==='opt' || x.kind==='market')) openPlace(x.it, di);
 }
 
 /* 패널 */
@@ -1142,7 +1231,7 @@ function paintCustom(di, res){
   const last = L[L.length-1];
   $('pchips').innerHTML = [`🚗 약 ${Math.round(km)}km`, `⏱ 운전 약 ${dur(drv)}`, ...d.chips.filter(c=>/일출|일몰|도보/.test(c)), last.kind==='stay' ? `🏨 ${last.rec ? last.rec.name : last.name}` : `🏁 ${fmt(last.arr)} 도착`]
     .map(c=>`<span class="chip">${c}</span>`).join('');
-  const tag = { spot:'코스 명소', gen:'일반 명소 · 추가', meal:'식사', stay:'숙박', opt:'선택 일정' };
+  const tag = { spot:'코스 명소', gen:'일반 명소 · 추가', meal:'식사', stay:'숙박', opt:'선택 일정', market:'전통시장' };
   const short = x => x.name.replace(/^(아침|점심|저녁) · /,'');
   const sunset = toMin((d.chips.find(c=>c.includes('일몰'))||''));
   let h = planBar() + '<div class="tl">', n = 0;
@@ -1450,7 +1539,7 @@ function openSpot(key, dayIdx){
 }
 function openPlace(it, dayIdx){
   const d = DAYS[dayIdx];
-  const kind = {meal:'🍽 식사', stay:'🏨 숙박 거점', opt:'✨ 선택 일정'}[it.type];
+  const kind = {meal:'🍽 식사', stay:'🏨 숙박 거점', opt:'✨ 선택 일정', market:'🏪 전통시장'}[it.type];
   $('mk').innerHTML = `${kind} · <span style="color:${d.color}">${dayIdx+1}일차 ${d.date}</span>`;
   $('mt').textContent = it.name;
   const q = it.q || it.name;
@@ -1458,13 +1547,26 @@ function openPlace(it, dayIdx){
   $('mb').innerHTML = `<div class="mcontent" style="padding-top:16px">
       <div class="mrow"><span class="k">시간</span><span class="v">${it.t}</span></div>
       <div class="mrow"><span class="k">안내</span><span class="v">${it.ds}</span></div>
+      ${it.type==='market' ? marketRows(it) : ''}
     </div>
+    ${it.type==='market' ? `<div class="sect" style="margin:14px 16px 0">시장 안·옆 식당 · 카카오맵 후기 순</div>` : ''}
     ${recs.length ? recHtml(recs, it.type) : `<div class="mbtns">${mapLinks(q)}</div>`}
     <div class="credit">${it.type==='stay'
       ? '숙소는 다음 날 첫 일정과의 거리를 기준으로 드라이브인·무인텔·1실 1주차 순으로 골랐습니다(10/25 재점검: 여기어때 지역 목록 평점·후기, 카카오맵 태그·후기). 요금은 조회 시점 표시가라 날짜·인원·잔여 객실에 따라 달라질 수 있으니 예약 전 앱에서 확인하세요.'
       : '지나는 지역의 카카오맵 음식점을 카카오 후기 + 블로그 후기가 많은 순으로 모은 뒤, 여행 당일 요일·도착 시각에 영업 중인 곳(마감·브레이크타임·휴무 확인)만 남겨 혼자 주문할 메뉴가 있는 한식 위주로 골랐어요(10/25 조회). 방문 전 전화로 한 번 더 확인하세요.'}</div>`;
   MODAL.classList.add('open'); document.body.style.overflow = 'hidden';
   if(HAS_MAP && it.coord) MV.fly(it.coord);
+}
+/* 전통시장: 영업·주차장·정보 링크·대표 사진 */
+function marketRows(it){
+  const row = (k,v)=> v ? `<div class="mrow"><span class="k">${k}</span><span class="v">${v}</span></div>` : '';
+  const p = it.park || {};
+  const navLinks = p.c ? ` · <a href="https://map.kakao.com/link/to/${encodeURIComponent(p.name)},${p.c[0]},${p.c[1]}" target="_blank" rel="noopener">카카오맵 길찾기</a>` : '';
+  const links = [it.info ? `<a href="${it.info}" target="_blank" rel="noopener">카카오맵 시장 정보·사진</a>` : '', it.info2 ? `<a href="${it.info2}" target="_blank" rel="noopener">한국관광 안내</a>` : ''].filter(Boolean).join(' · ');
+  return row('시장 영업', it.mhours)
+    + row('주차장', p.name ? `<b>${p.name}</b><br>${p.addr}<br><span style="color:var(--tx2)">${p.walk || ''}${p.alt ? ' · 대안: '+p.alt : ''}</span>${navLinks}` : '')
+    + row('정보', links)
+    + (it.photo ? `<div class="mrow"><span class="k">사진</span><span class="v"><img src="${it.photo}" alt="${it.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px" onerror="this.replaceWith(Object.assign(document.createElement('a'),{href:this.src,target:'_blank',textContent:'사진 보기 (새 창)'}))"></span></div>` : '');
 }
 function recShort(r){ return r.price ? r.price.split(' (')[0] : r.menu.split(' · ')[0]; }
 function recHtml(list, type){
