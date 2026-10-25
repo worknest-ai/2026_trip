@@ -261,6 +261,8 @@ if(typeof L === 'undefined'){
   .ures .umsg{ padding:8px 11px; border-top:1px solid #1f2839; color:var(--tx2); font-size:13px; }
   .gsbox{ margin-top:16px; padding-top:4px; border-top:1px dashed #2c3850; } .gsbox .gsp{ color:var(--tx2); font-size:13.5px; line-height:1.6; margin:6px 0 8px; }
   .gsin{ display:block; width:100%; box-sizing:border-box; margin:0 0 8px; background:#0e1420; color:#e8edf5; border:1px solid var(--line2); border-radius:8px; padding:9px 10px; font:inherit; font-size:14px; }
+  .gsdiag{ margin-top:10px; padding:10px 12px; border:1px solid #5a4a20; background:#2a2312; border-radius:10px; font-size:13.5px; line-height:1.6; color:#e8dcc0; }
+  .gsdiag ul{ margin:8px 0 0; padding-left:18px; } .gsdiag li{ margin:4px 0; } .gsdiag code{ background:#0e1420; padding:1px 5px; border-radius:4px; font-size:12.5px; }
   .addp .ar{ display:flex; gap:8px; align-items:center; padding:8px 11px; border-top:1px solid #1f2839; font-size:12.5px; }
   .addp .ar .a1{ flex:1; min-width:0; } .addp .ar .a1 b{ display:block; } .addp .ar .a1 span{ display:block; color:var(--tx3); font-size:11.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .rt{ border:1px solid var(--line2); border-radius:12px; padding:10px 12px; margin-top:10px; }
@@ -1500,14 +1502,30 @@ async function gsPull(){
   LS.set(K_SAVED, list);
   return n;
 }
+/* 마지막 연결 시도 (실패 시 진단 안내에 씀) */
+let GS_TRY = null;
+function gsDiag(){
+  if(!GS_TRY) return '';
+  const test = `${GS_TRY.url}?action=ping&key=${encodeURIComponent(GS_TRY.key)}`;
+  return `<div class="gsdiag"><b>⚠ 연결하지 못했어요 · 원인 확인하기</b>
+    <p>아래 버튼으로 웹 앱 주소를 새 창에서 열면, 구글이 보여 주는 화면으로 원인을 알 수 있어요.</p>
+    <div class="rbtns"><a class="mbtn go" href="${esc(test)}" target="_blank" rel="noopener">🔗 웹 앱 주소 열어 보기</a></div>
+    <ul>
+      <li><code>{"ok":true,"pong":true}</code> → 웹 앱은 정상이에요. 이 페이지를 새로고침한 뒤 다시 연결해 보세요.</li>
+      <li><code>{"ok":false,"error":"key"}</code> → 비밀 키가 달라요. 스크립트의 SECRET(따옴표 안 글자)과 같게 넣고, SECRET을 고쳤다면 <b>배포 → 배포 관리 → ✏️ → 버전: 새 버전 → 배포</b>.</li>
+      <li><b>구글 로그인 화면</b> 또는 "액세스 권한이 필요함" → 배포 설정의 <b>액세스 권한이 있는 사용자</b>를 <b>모든 사용자</b>로 바꿔 새 버전으로 배포.</li>
+      <li>"<b>스크립트 함수를 찾을 수 없음: doGet</b>" 또는 빨간 오류 문구 → 코드를 다 붙여넣고 💾 저장했는지, SECRET 줄이 <code>const SECRET = '내비밀번호';</code>처럼 따옴표로 감싸져 있는지 확인한 뒤 새 버전으로 배포.</li>
+      <li>"<b>페이지를 찾을 수 없음</b>" → 주소가 틀렸어요. <b>배포 → 배포 관리</b>의 웹 앱 URL을 다시 복사.</li>
+    </ul></div>`;
+}
 function gsBox(){
   const c = gsCfg();
   return `<div class="gsbox"><div class="sect">☁ 구글 시트에 저장</div>${c
     ? `<p class="gsp">연결됨 · 💾 저장할 때마다 구글 드라이브의 시트에도 함께 저장되고, 다른 기기에서도 불러올 수 있어요.</p>
        <div class="rbtns"><button class="mbtn" data-r="gspull">⬇ 시트에서 불러오기</button><button class="mbtn" data-r="gspush">⬆ 저장된 경로 모두 보내기</button><button class="mbtn" data-r="gsoff">연결 해제</button></div>`
     : `<p class="gsp">구글 시트의 Apps Script 웹 앱 주소와 비밀 키를 넣으면, 저장한 경로가 구글 드라이브의 시트에도 저장돼요.</p>
-       <input class="gsin" id="gsUrl" placeholder="https://script.google.com/macros/s/…/exec"><input class="gsin" id="gsKey" placeholder="비밀 키">
-       <div class="rbtns"><button class="mbtn go" data-r="gson">연결하기</button></div>`}</div>`;
+       <input class="gsin" id="gsUrl" placeholder="웹 앱 URL · https://script.google.com/macros/s/…/exec" value="${esc(GS_TRY ? GS_TRY.url : '')}"><input class="gsin" id="gsKey" placeholder="비밀 키 · 스크립트 SECRET 따옴표 안 글자" value="${esc(GS_TRY ? GS_TRY.key : '')}">
+       <div class="rbtns"><button class="mbtn go" data-r="gson">연결하기</button></div>${gsDiag()}`}</div>`;
 }
 async function gsAction(a){
   try{
@@ -1525,9 +1543,11 @@ async function gsAction(a){
       if(/\/dev(\?|$)/.test(url)) return alert('…/dev 로 끝나는 주소는 테스트용이라 연결되지 않아요.\n[배포 → 배포 관리]의 웹 앱 URL(…/exec)을 넣어 주세요.');
       if(!/^https:\/\/script\.google(usercontent)?\.com\/.*\/exec(\?|$)/.test(url))
         return alert(`웹 앱 주소가 아니에요:\n${url.slice(0, 80)}\n\n[배포 → 배포 관리]에서 "웹 앱 URL"(https://script.google.com/macros/s/…/exec)을 복사해 주세요.\n주소와 비밀 키 칸이 바뀌지 않았는지도 확인해 주세요.`);
+      GS_TRY = { url, key };
       LS.set(K_GS, { url, key });
       const j = await gsGet({ action:'ping' });
-      if(!j.ok){ LS.set(K_GS, null); return alert(j.error==='key' ? '비밀 키가 맞지 않아요.\n스크립트의 SECRET 값과 같은지, SECRET을 바꾼 뒤 [배포 → 배포 관리 → 수정 → 새 버전]으로 다시 배포했는지 확인해 주세요.' : '연결하지 못했어요. 웹 앱 배포 설정(액세스: 모든 사용자)을 확인해 주세요.'); }
+      if(!j.ok){ LS.set(K_GS, null); alert(j.error==='key' ? '비밀 키가 맞지 않아요.\n스크립트의 SECRET 값(따옴표 안 글자)과 같은지, SECRET을 바꾼 뒤 [배포 → 배포 관리 → ✏️ → 새 버전]으로 다시 배포했는지 확인해 주세요.' : '연결하지 못했어요. 아래 "웹 앱 주소 열어 보기"로 원인을 확인해 주세요.'); return openRoutes(); }
+      GS_TRY = null;
       const local = savedList();
       for(const r of local){ const k = await gsPost({ action:'save', route:{ v:PLAN_V, id:r.id, name:r.name, updated:r.updated, days:r.days } }); if(!k.ok) throw new Error(k.error); }
       const n = await gsPull();
@@ -1539,7 +1559,8 @@ async function gsAction(a){
   }catch(e){
     if(a==='gson') LS.set(K_GS, null);
     alert(e && e.message==='key' ? '비밀 키가 맞지 않아요. 스크립트를 고쳤다면 새 버전으로 다시 배포해 주세요.'
-      : '구글 시트와 통신하지 못했어요.\n· 웹 앱 주소가 …/exec 로 끝나는지\n· 배포 액세스가 "모든 사용자"인지\n· 인터넷 연결\n을 확인해 주세요.');
+      : a==='gson' ? '구글 시트 웹 앱에서 응답을 받지 못했어요.\n창을 닫으면 나오는 "🔗 웹 앱 주소 열어 보기"를 눌러 원인을 확인해 주세요.'
+      : '구글 시트와 통신하지 못했어요. 인터넷 연결을 확인해 주세요.');
   }
   openRoutes();
 }
