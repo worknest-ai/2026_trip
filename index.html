@@ -263,6 +263,12 @@ if(typeof L === 'undefined'){
   .gsin{ display:block; width:100%; box-sizing:border-box; margin:0 0 8px; background:#0e1420; color:#e8edf5; border:1px solid var(--line2); border-radius:8px; padding:9px 10px; font:inherit; font-size:14px; }
   .gsdiag{ margin-top:10px; padding:10px 12px; border:1px solid #5a4a20; background:#2a2312; border-radius:10px; font-size:13.5px; line-height:1.6; color:#e8dcc0; }
   .gsdiag ul{ margin:8px 0 0; padding-left:18px; } .gsdiag li{ margin:4px 0; } .gsdiag code{ background:#0e1420; padding:1px 5px; border-radius:4px; font-size:12.5px; }
+  .vsw{ display:flex; gap:6px; margin-bottom:8px; } .vbtn{ flex:1; background:var(--card); border:1px solid var(--line2); color:#cfd6e2; border-radius:10px; padding:9px 8px; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+  .vbtn.on{ background:#24406f; border-color:#5b8def; color:#fff; } .vbtn.act.on{ background:#1d4a31; border-color:#2fd27a; color:#fff; }
+  .cfbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:9px; padding-top:8px; border-top:1px dashed #2c3850; }
+  .cfbtn{ border-color:#2f9e5b !important; color:#7ee0a1 !important; } .cfok{ color:#7ee0a1; font-size:13px; font-weight:700; }
+  .actbar{ display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 12px; } .actbar .mbtn{ flex:1 1 auto; }
+  .card.stop.act{ border-color:#245a3c; }
   .addp .ar{ display:flex; gap:8px; align-items:center; padding:8px 11px; border-top:1px solid #1f2839; font-size:12.5px; }
   .addp .ar .a1{ flex:1; min-width:0; } .addp .ar .a1 b{ display:block; } .addp .ar .a1 span{ display:block; color:var(--tx3); font-size:11.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .rt{ border:1px solid var(--line2); border-radius:12px; padding:10px 12px; margin-top:10px; }
@@ -874,6 +880,7 @@ function drawMap(){
   if(!HAS_MAP) return;
   MV.clear();
   const bounds = [];
+  if(VIEW==='act'){ drawAct(bounds); if(bounds.length){ try{ MV.fit(bounds); }catch(e){} } return; }
   if(curDay === -1){
     DAYS.forEach((d,di)=>{
       dayLines(di, 4, .9, bounds);
@@ -1197,8 +1204,9 @@ function openStop(di, x){
 /* 패널 */
 function renderPanel(){
   if(curDay === -1){ renderOverview(); addPlanBar(); }
+  else if(VIEW==='act') renderActDay();
   else if(PLAN.days[curDay]) renderCustomDay();
-  else { renderDay(); addPlanBar(); }
+  else { renderDay(); addPlanBar(); addConfirmButtons(curDay); }
 }
 function refresh(){
   const pb = $('pbody'), y = pb.scrollTop;
@@ -1207,12 +1215,13 @@ function refresh(){
 }
 function addPlanBar(){ $('pbody').insertAdjacentHTML('afterbegin', planBar()); bindPlanBar(); }
 function planBar(){
-  const n = LS.get(K_SAVED, []).length;
+  const n = LS.get(K_SAVED, []).length, na = actCount();
   return `<div class="plan">
-    <div class="pl1"><span class="pn">📁 ${esc(PLAN.name)}${PLAN.dirty ? ' <em>· 저장 안 됨</em>' : ''}</span>
-      <button class="pbtn" data-p="save">💾 저장</button><button class="pbtn" data-p="list">📂 내 경로${n ? ` ${n}` : ''}</button></div>
-    ${curDay>=0 ? `<div class="pl2"><button class="pbtn${editMode?' on':''}" data-p="edit">${editMode ? '✔ 편집 끝내기' : '✏️ 경로 편집 · 장소 추가'}</button>${PLAN.days[curDay] ? '<button class="pbtn" data-p="reset">↺ 이 날 기본 일정으로</button>' : ''}</div>` : ''}
-    ${curDay>=0 && editMode ? '<div class="phint">▲▼ 순서 바꾸기 · ✕ 빼기 · −/＋ 머무는 시간. 바꾸면 이후 도착 시각이 자동으로 다시 계산돼요. 맨 아래에서 <b>업체명·주소로 직접 추가</b>하거나, 일반 명소·맛집·숙소를 골라 넣으세요.</div>' : ''}
+    <div class="pl0 vsw"><button class="vbtn${VIEW==='plan'?' on':''}" data-p="vplan">📅 예정 경로</button><button class="vbtn act${VIEW==='act'?' on':''}" data-p="vact">✅ 확정 경로${na ? ` · ${na}곳` : ''}${ACT.dirty ? ' ⚠' : ''}</button></div>
+    ${VIEW==='plan' ? `<div class="pl1"><span class="pn">📁 ${esc(PLAN.name)}${PLAN.dirty ? ' <em>· 저장 안 됨</em>' : ''}</span>
+      <button class="pbtn" data-p="save">💾 저장</button><button class="pbtn" data-p="list">📂 내 경로${n ? ` ${n}` : ''}</button></div>` : ''}
+    ${curDay>=0 && VIEW==='plan' ? `<div class="pl2"><button class="pbtn${editMode?' on':''}" data-p="edit">${editMode ? '✔ 편집 끝내기' : '✏️ 경로 편집 · 장소 추가'}</button>${PLAN.days[curDay] ? '<button class="pbtn" data-p="reset">↺ 이 날 기본 일정으로</button>' : ''}</div>` : ''}
+    ${curDay>=0 && VIEW==='plan' && editMode ? '<div class="phint">▲▼ 순서 바꾸기 · ✕ 빼기 · −/＋ 머무는 시간. 바꾸면 이후 도착 시각이 자동으로 다시 계산돼요. 맨 아래에서 <b>업체명·주소로 직접 추가</b>하거나, 일반 명소·맛집·숙소를 골라 넣으세요.</div>' : ''}
   </div>`;
 }
 function bindPlanBar(){ $('pbody').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>planAction(b.dataset.p)); }
@@ -1223,6 +1232,7 @@ function pristine(di){
 }
 function tidy(di){ if(di>=0 && PLAN.days[di] && pristine(di)){ PLAN.days[di] = null; LS.set(K_DRAFT, PLAN); } }
 function planAction(a){
+  if(a==='vplan' || a==='vact') return setView(a==='vact' ? 'act' : 'plan');
   if(a==='save') return savePlan(false);
   if(a==='list') return openRoutes();
   if(a==='edit'){
@@ -1297,6 +1307,7 @@ function paintCustom(di, res){
   pb.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>pickRec(+el.dataset.j, el.dataset.pick==='' ? null : +el.dataset.pick));
   pb.querySelectorAll('[data-add]').forEach(el=>el.onclick=()=>addStop(el.dataset.add));
   if(ed) bindUserAdd(di, L);
+  else addConfirmButtons(di);
 }
 
 /* ---------------- 직접 추가: 업체명·주소 검색 → 경로에 넣기 ----------------
@@ -1467,6 +1478,218 @@ function savedList(){
     .map(r=>({ ...r, days:sanitizeDays(r.days, r.v||1), v:PLAN_V }));
 }
 function changedDays(days){ const c = days.map((d,i)=>d ? i+1 : 0).filter(Boolean); return c.length ? `${c.join('·')}일차 수정` : '기본 일정과 같음'; }
+/* ================= 확정 경로 (실제로 다녀온 곳) =================
+   예정 경로(기본 일정·내 경로)와 따로 기록합니다.
+   ACT.days[di] = [{k:'u', cat:'spot'|'meal'|'stay', name, addr, c:[lat,lon], at:'HH:MM', src:'코스'|'추천'|'직접', url?, memo?}]
+   예정 화면 카드의 [✅ 확정] 또는 확정 화면에서 추가·수정 → [✔ 확정 저장] = 이 기기 + 구글 시트('ACTUAL' 행, 직접추가장소 탭) */
+const K_ACT = 'trip26.actual', K_VIEW = 'trip26.view', ACT_ID = 'ACTUAL', ACT_NAME = '✅ 확정 경로 (실제 다녀온 곳)';
+const actBlank = ()=>({ updated:0, dirty:false, days:DAYS.map(()=>[]) });
+const actClean = days => days.map(d=>Array.isArray(d) ? d.filter(s=>s && s.name && Array.isArray(s.c) && s.c.length===2) : []);
+let ACT = (()=>{ const a = LS.get(K_ACT, null); return a && Array.isArray(a.days) && a.days.length===DAYS.length ? { updated:a.updated||0, dirty:!!a.dirty, days:actClean(a.days) } : actBlank(); })();
+let VIEW = LS.get(K_VIEW, 'plan')==='act' ? 'act' : 'plan';
+const ACT_RES = {};
+const ACAT = { spot:{label:'명소', ic:'📍', cls:'gen'}, meal:{label:'식당', ic:'🍽', cls:'meal'}, stay:{label:'숙소', ic:'🏨', cls:'stay'} };
+function actTouch(){ ACT.dirty = true; LS.set(K_ACT, ACT); }
+function actSort(di){ ACT.days[di].sort((a,b)=>((a.cat==='stay')-(b.cat==='stay')) || ((toMin(a.at)??0)-(toMin(b.at)??0))); }
+/* 여행 당일이면 지금 시각, 아니면 null */
+function nowHM(di){
+  const m = /(\d+)\/(\d+)/.exec(DAYS[di].date), n = new Date();
+  return m && n.getMonth()+1===+m[1] && n.getDate()===+m[2] ? fmt(n.getHours()*60 + n.getMinutes()) : null;
+}
+function actAdd(di, e, plannedT){
+  if(!e || !e.c) return;
+  const A = ACT.days[di], last = A.filter(x=>x.cat!=='stay').pop();
+  const at = nowHM(di) || (toMin(plannedT)!=null ? fmt(toMin(plannedT)) : (last ? fmt(toMin(last.at)+60) : '10:00'));
+  const s = { k:'u', cat:e.cat, name:e.name, addr:e.addr||'', c:[+(+e.c[0]).toFixed(6), +(+e.c[1]).toFixed(6)], at, src:e.src||'직접' };
+  if(e.url) s.url = e.url;
+  if(e.cat==='stay') ACT.days[di] = A.filter(x=>x.cat!=='stay');
+  ACT.days[di].push(s); actSort(di); actTouch();
+  toast(`✅ ${e.name} 확정 (${at}) · [✅ 확정 경로]에서 ✔ 확정 저장을 눌러 주세요`);
+  refresh();
+}
+/* 예정 항목 → 확정 항목 */
+function planEntry(it, rec){
+  if(it.type==='spot'){ const s = SPOTS[it.key]; return { cat:'spot', name:s.name, addr:s.parking||'', c:s.coord, src:'코스' }; }
+  if(rec) return { cat: it.type==='stay' ? 'stay' : 'meal', name:rec.name, addr:rec.addr||'', c:recCoord(rec, it.coord), url:rec.url, src:'추천' };
+  return { cat: it.type==='stay' ? 'stay' : it.type==='meal' ? 'meal' : 'spot', name:it.name.replace(/^(전통시장|아침|점심|저녁|\(선택\)) ?· ?/,'').replace(/^\(선택\) /,''), addr:(it.park && it.park.addr) || '', c:it.coord, src:'코스' };
+}
+function infoEntry(x){
+  if(x.u) return { cat:x.u.cat, name:x.u.name, addr:x.u.addr, c:x.u.c, url:x.u.url, src:'직접' };
+  if(x.kind==='spot' || x.kind==='gen'){ const s = SPOTS[x.key]; return { cat:'spot', name:s.name, addr:s.parking||'', c:s.coord, src:'코스' }; }
+  if((x.kind==='meal' || x.kind==='stay') && x.rec) return { cat:x.kind, name:x.rec.name, addr:x.rec.addr||'', c:x.coord, url:x.rec.url, src:'추천' };
+  return x.it ? planEntry(x.it) : null;
+}
+const actFind = (di, name)=> ACT.days[di].find(x=>x.name===name);
+/* 예정 화면 카드마다 [✅ 확정] 버튼 */
+function addConfirmButtons(di){
+  if(VIEW!=='plan' || di<0) return;
+  const put = (el, entryFn, it)=>{
+    const card = el && el.querySelector('.card'); if(!card) return;
+    const e0 = entryFn(null), done = e0 && actFind(di, e0.name);
+    const needPick = it && (it.type==='meal' || it.type==='stay') && (RECS[it.rk]||[]).length;
+    const hit = needPick ? ACT.days[di].find(x=>(RECS[it.rk]||[]).some(r=>r.name===x.name)) : done;
+    const bar = document.createElement('div'); bar.className = 'cfbar';
+    bar.innerHTML = hit ? `<span class="cfok">✅ 확정됨 · ${hit.at} · ${esc(hit.name)}</span><button class="pbtn">다시 고르기</button>` : `<button class="pbtn cfbtn">✅ 확정${needPick ? ' · 실제로 간 곳 고르기' : ''}</button>`;
+    bar.querySelector('button').onclick = ev=>{ ev.stopPropagation(); needPick ? openConfirmPicker(di, it) : actAdd(di, entryFn(null), it ? it.t : null); };
+    bar.onclick = ev=>ev.stopPropagation();
+    card.appendChild(bar);
+  };
+  const res = PLAN.days[di] ? resFor(di) : null;
+  if(res) res.list.forEach((x,j)=>{ if(x.kind==='start' || x.kind==='end') return;
+    const it = x.it && !x.rec && (x.kind==='meal' || x.kind==='stay') ? x.it : null;
+    put($('it-c'+j), ()=>infoEntry(x), it); });
+  else DAYS[di].items.forEach((it,ii)=>{ if(['drive','start','end'].includes(it.type)) return; put($('it-'+ii), ()=>planEntry(it), it); });
+}
+function openConfirmPicker(di, it){
+  const recs = RECS[it.rk]||[];
+  $('mk').innerHTML = `✅ 확정 · <span style="color:${DAYS[di].color}">${di+1}일차 ${DAYS[di].date}</span>`;
+  $('mt').textContent = `${it.name.split(' · ')[0]} · 실제로 간 곳 고르기`;
+  $('mb').innerHTML = `<div class="mcontent addp" style="padding-top:12px"><div class="agrp ${it.type}">${recs.map((r,ri)=>`<div class="ar"><div class="a1"><b>${esc(r.name)}</b><span>${esc(r.kind)} · ${esc(recShort(r))}</span></div><button class="pbtn on" data-cp="${ri}">✅ 여기로 확정</button></div>`).join('')}
+      <div class="ar"><div class="a1"><b>목록에 없는 곳에 갔어요</b><span>확정 경로 화면에서 업체명·주소로 검색해 넣어요</span></div><button class="pbtn" data-cp="x">직접 입력</button></div></div></div>`;
+  $('mb').querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{
+    closeModal();
+    if(b.dataset.cp==='x'){ AU.cat = it.type==='stay' ? 'stay' : 'meal'; setView('act'); return; }
+    actAdd(di, planEntry(it, recs[+b.dataset.cp]), it.t);
+  });
+  MODAL.classList.add('open'); document.body.style.overflow = 'hidden';
+}
+function setView(v){ VIEW = v; LS.set(K_VIEW, v); editMode = false; refresh(); }
+const actCount = ()=> ACT.days.reduce((s,d)=>s+d.length, 0);
+/* 확정 경로 이동 거리·도로 경로 (OSRM) */
+function actSig(di){ return JSON.stringify(ACT.days[di].map(s=>s.c)); }
+async function actRoute(di){
+  const sig = actSig(di), hit = ACT_RES[di]; if(hit && hit.sig===sig) return hit;
+  const A = ACT.days[di]; if(A.length < 2) return ACT_RES[di] = { sig, km:0, geom:null };
+  const r = await legsFor(A.map(s=>s.c));
+  return ACT_RES[di] = { sig, km:r.legs.reduce((t,l)=>t+l.km, 0), geom:r.geom };
+}
+/* 확정 경로 화면 */
+const AU = { q:'', cat:'spot', list:[], busy:false, msg:'' };
+function renderActDay(){
+  const di = curDay, d = DAYS[di], A = ACT.days[di];
+  $('pday').innerHTML = `<span style="color:${d.color}">${di+1}일차</span> · ${d.date} · <span style="color:#7ee0a1">✅ 확정 경로</span>`;
+  $('ptitle').textContent = d.title;
+  $('psub').textContent = '실제로 다녀온 곳을 기록해요. 예정 화면 카드의 [✅ 확정]으로 넣거나, 아래에서 업체명·주소로 추가하세요. 시각을 고치면 순서가 바뀌고, ✔ 확정 저장을 누르면 이 기기와 구글 시트에 저장돼요.';
+  const hit = ACT_RES[di] && ACT_RES[di].sig===actSig(di) ? ACT_RES[di] : null;
+  $('pchips').innerHTML = [`✅ 확정 ${A.length}곳`, hit && hit.km ? `🚗 실제 약 ${Math.round(hit.km)}km` : '', ACT.dirty ? '⚠ 저장 안 됨' : (ACT.updated ? `💾 ${new Date(ACT.updated).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} 저장` : '')]
+    .filter(Boolean).map(c=>`<span class="chip">${c}</span>`).join('');
+  let h = planBar();
+  h += `<div class="actbar"><button class="mbtn go" data-x="save">✔ 확정 저장${ACT.dirty ? ' (저장 안 됨)' : ''}</button><button class="mbtn" data-x="import">📅 예정 일정을 확정으로 모두 가져오기</button></div>`;
+  h += '<div class="tl">';
+  if(!A.length) h += `<div class="tip">아직 확정한 곳이 없어요. <b>📅 예정 경로</b> 화면에서 카드마다 있는 <b>✅ 확정</b>을 누르거나, 위의 <b>예정 일정을 확정으로 모두 가져오기</b>로 시작한 뒤 바뀐 곳만 고치세요.</div>`;
+  A.forEach((s,j)=>{
+    const c = ACAT[s.cat] || ACAT.spot;
+    h += `<div class="it"><div class="tm">${s.cat==='stay' ? '<small>숙박</small>' : esc(s.at)}</div>
+      <div class="card stop act"><div class="click" data-o="${j}"><div class="t1"><span class="num" style="background:#2f9e5b">${j+1}</span><span class="tagk ${c.cls}">${c.ic} ${c.label}</span>${esc(s.name)}</div>
+        <div class="t2">${esc(s.addr||'')}${s.addr ? ' · ' : ''}${s.src==='직접' ? '✍ 직접 추가' : s.src==='추천' ? '추천 목록에서 확정' : '예정 코스에서 확정'}${s.memo ? `<br>📝 ${esc(s.memo)}` : ''}</div></div>
+        <div class="ctl">${s.cat!=='stay' ? `<button class="pbtn" data-x="t-" data-j="${j}">−10분</button><button class="pbtn" data-x="t+" data-j="${j}">＋10분</button><button class="pbtn" data-x="time" data-j="${j}">🕒 시각</button>` : ''}<button class="pbtn" data-x="memo" data-j="${j}">📝 메모</button><button class="pbtn del" data-x="del" data-j="${j}">✕ 빼기</button></div></div></div>`;
+  });
+  h += '</div>';
+  h += `<div class="addp"><div class="agrp user"><div class="ah">＋ 실제로 간 곳 추가 · 업체명·주소로 검색</div>
+    <div class="uform"><select id="aCat">${Object.entries(ACAT).map(([k,u])=>`<option value="${k}"${AU.cat===k?' selected':''}>${u.ic} ${u.label}</option>`).join('')}</select>
+      <input id="aQ" type="search" enterkeyhint="search" placeholder="업체명 또는 주소" value="${esc(AU.q)}"><button class="pbtn on" id="aGo">검색</button></div>
+    <div id="aRes" class="ures"></div></div></div>`;
+  h += `<div class="tip">💡 예정 경로는 지도에 회색 점선, 확정 경로는 초록 실선으로 함께 보여요. 숙소를 확정하면 그날 숙소는 하나만 남아요.</div>`;
+  $('pbody').innerHTML = h;
+  bindPlanBar();
+  const pb = $('pbody');
+  pb.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>actAction(b.dataset.x, +b.dataset.j));
+  pb.querySelectorAll('[data-o]').forEach(el=>el.onclick=()=>openActStop(di, +el.dataset.o));
+  bindActAdd(di);
+  if(!hit && A.length > 1) actRoute(di).then(()=>{ if(curDay===di && VIEW==='act'){ renderActDay(); drawMap(); } });
+}
+function actAction(a, j){
+  const di = curDay, A = ACT.days[di], s = A[j];
+  if(a==='save') return actCommit();
+  if(a==='import'){
+    if(A.length && !confirm('지금 확정 목록 뒤에 예정 일정을 모두 덧붙일까요? (이미 있는 곳은 건너뛰어요)')) return;
+    stopsOf(di).forEach(st=>{
+      const x = stopInfo(di, st); if(x.kind==='start' || x.kind==='end' || x.kind==='opt' && !x.it) return;
+      const e = infoEntry(x); if(!e || actFind(di, e.name)) return;
+      const t = x.it && x.it.t && /\d/.test(x.it.t) ? x.it.t : (x.hold!=null ? fmt(x.hold) : null);
+      A.push({ k:'u', cat:e.cat, name:e.name, addr:e.addr||'', c:[+(+e.c[0]).toFixed(6), +(+e.c[1]).toFixed(6)], at: t || (A.length ? A[A.length-1].at : '10:00'), src:e.src, ...(e.url ? {url:e.url} : {}) });
+    });
+    ACT.days[di] = A.filter((x,i,arr)=> x.cat!=='stay' || arr.findLastIndex(y=>y.cat==='stay')===i);
+    actSort(di); actTouch(); toast('예정 일정을 확정 목록으로 가져왔어요 · 바뀐 곳만 고치세요'); return refresh();
+  }
+  if(!s) return;
+  if(a==='t-' || a==='t+') s.at = fmt(Math.max(0, (toMin(s.at)??600) + (a==='t+' ? 10 : -10)));
+  else if(a==='time'){ const v = prompt('실제로 도착한 시각 (예: 14:20)', s.at); if(v==null) return; const m = toMin(v.trim()); if(m==null) return alert('시각은 14:20 처럼 넣어 주세요'); s.at = fmt(m); }
+  else if(a==='memo'){ const v = prompt('메모 (주차·대기·맛 등)', s.memo||''); if(v==null) return; s.memo = v.trim().slice(0, 200); if(!s.memo) delete s.memo; }
+  else if(a==='del'){ if(!confirm(`'${s.name}'을(를) 확정 목록에서 뺄까요?`)) return; A.splice(j, 1); }
+  else return;
+  actSort(di); actTouch(); refresh();
+}
+function actCommit(){
+  ACT.updated = Date.now(); ACT.dirty = false; LS.set(K_ACT, ACT);
+  if(!gsCfg()){ toast('✔ 확정 경로를 이 기기에 저장했어요 (구글 시트는 연결 안 됨)'); return refresh(); }
+  gsPost({ action:'save', route:{ v:PLAN_V, id:ACT_ID, name:ACT_NAME, updated:ACT.updated, days:ACT.days } })
+    .then(j=>toast(j.ok ? '✔ 확정 경로를 저장했어요 · ☁ 구글 시트에도 저장' : `확정은 이 기기에 저장됐지만 구글 시트 저장 실패 (${j.error||'오류'})`))
+    .catch(()=>toast('확정은 이 기기에 저장됐어요 · 구글 시트에 연결하지 못했어요'));
+  refresh();
+}
+function bindActAdd(di){
+  const q = $('aQ'), cat = $('aCat'), res = $('aRes'); if(!q) return;
+  const ref = ACT.days[di].length ? ACT.days[di].map(s=>s.c) : stopsOf(di).map(s=>stopInfo(di, s).coord);
+  const distTo = c => Math.min(...ref.map(p=>hav(p, c)));
+  const paint = ()=>{
+    let h = AU.busy ? '<div class="umsg">🔎 검색 중…</div>' : (AU.msg ? `<div class="umsg">${AU.msg}</div>` : '');
+    h += AU.list.map((p,i)=>`<div class="ar"><div class="a1"><b>${esc(p.name)}</b><span>${esc(p.addr||'')}${p.cat ? ' · '+esc(p.cat) : ''} · 약 ${Math.round(distTo(p.c))}km · ${p.src}</span></div><button class="pbtn on" data-au="${i}">✅ 확정 추가</button></div>`).join('');
+    if(AU.q && !AU.busy) h += `<div class="ar"><div class="a1"><b>🗺 지도에서 위치 찍기</b><span>검색이 안 되면 지도를 눌러 "${esc(AU.q)}" 위치를 정해요</span></div><button class="pbtn" id="aPick">지도에서 찍기</button></div>`;
+    res.innerHTML = h;
+    res.querySelectorAll('[data-au]').forEach(b=>b.onclick=()=>{ const p = AU.list[+b.dataset.au]; AU.list = []; AU.q = ''; AU.msg = ''; actAdd(di, { cat:cat.value, name:p.name, addr:p.addr, c:p.c, url:p.url, src:'직접' }); });
+    const pk = $('aPick'); if(pk) pk.onclick = ()=>{
+      if(!HAS_MAP || !MV.pick) return toast('지도를 불러오지 못해 위치를 찍을 수 없어요');
+      const name = AU.q; toast('지도에서 위치를 눌러 주세요');
+      try{ document.getElementById('map').scrollIntoView({ behavior:'smooth', block:'start' }); }catch(e){}
+      MV.pick(c=>{ AU.list = []; AU.q = ''; actAdd(di, { cat:cat.value, name, addr:`지도에서 찍은 위치 (${c[0].toFixed(5)}, ${c[1].toFixed(5)})`, c, src:'직접' }); });
+    };
+  };
+  const run = async ()=>{
+    AU.q = q.value.trim(); AU.cat = cat.value; if(!AU.q) return;
+    AU.busy = true; AU.msg = ''; paint();
+    try{ AU.list = await searchPlace(AU.q, ref); }catch(e){ AU.list = []; }
+    AU.busy = false; AU.list.sort((a,b)=>distTo(a.c)-distTo(b.c));
+    AU.msg = AU.list.length ? '' : '검색 결과가 없어요. 주소는 "시·군 + 도로명 + 번지"로 넣어 보거나, 아래에서 지도에 직접 찍어 주세요.';
+    paint();
+  };
+  cat.onchange = ()=>{ AU.cat = cat.value; };
+  $('aGo').onclick = run;
+  q.onkeydown = e=>{ if(e.key==='Enter'){ e.preventDefault(); run(); } };
+  paint();
+}
+function openActStop(di, j){
+  const s = ACT.days[di][j]; if(!s) return;
+  const c = ACAT[s.cat] || ACAT.spot;
+  $('mk').innerHTML = `✅ 확정한 ${c.label} · <span style="color:${DAYS[di].color}">${di+1}일차 ${DAYS[di].date}</span>`;
+  $('mt').textContent = s.name;
+  $('mb').innerHTML = `<div class="mcontent" style="padding-top:16px">
+      <div class="mrow"><span class="k">시각</span><span class="v">${s.cat==='stay' ? '숙박' : esc(s.at)}</span></div>
+      <div class="mrow"><span class="k">주소</span><span class="v">${esc(s.addr||'')}</span></div>
+      ${s.memo ? `<div class="mrow"><span class="k">메모</span><span class="v">${esc(s.memo)}</span></div>` : ''}
+    </div>
+    <div class="mbtns">${s.url ? `<a class="mbtn go" href="${esc(s.url)}" target="_blank" rel="noopener">카카오맵 정보</a>` : ''}<a class="mbtn" href="https://map.kakao.com/link/to/${encodeURIComponent(s.name)},${s.c[0]},${s.c[1]}" target="_blank" rel="noopener">카카오맵 길찾기</a>${mapLinks(s.name)}</div>`;
+  MODAL.classList.add('open'); document.body.style.overflow = 'hidden';
+  if(HAS_MAP) MV.fly(s.c);
+}
+/* 지도: 확정 보기 = 예정 경로(회색 점선) + 확정 경로(초록 실선·번호) */
+function drawAct(bounds){
+  const days = curDay===-1 ? DAYS.map((d,i)=>i) : [curDay];
+  days.forEach(di=>{
+    const plan = !PLAN.days[di] ? ROUTES[di] : (resFor(di) && resFor(di).geom ? [resFor(di).geom] : [stopsOf(di).map(s=>stopInfo(di, s).coord)]);
+    plan.forEach(p=>{ MV.line(p, { color:'#8a93a6', weight:3, opacity:.75, dash:true }); if(curDay!==-1) p.forEach(c=>bounds.push(c)); });
+    const A = ACT.days[di]; if(!A.length) return;
+    const r = ACT_RES[di] && ACT_RES[di].sig===actSig(di) ? ACT_RES[di] : null;
+    if(A.length > 1){ MV.line(r && r.geom ? r.geom : A.map(s=>s.c), { color:'#2fd27a', weight:5, opacity:.95, dash:!(r && r.geom) }); if(!r) actRoute(di).then(()=>{ if(VIEW==='act') drawMap(); }); }
+    A.forEach((s,j)=>{
+      bounds.push(s.c);
+      MV.marker(s.c, { ...circ(`<div class="mk" style="background:#2f9e5b">${curDay===-1 ? di+1 : j+1}</div>`, curDay===-1 ? 22 : 26, 900),
+        tip:`${curDay===-1 ? (di+1)+'일차 · ' : ''}${s.cat==='stay' ? '숙박' : s.at} ${esc(s.name)}`, perm: curDay!==-1, click:()=>{ curDay = di; openActStop(di, j); } });
+    });
+  });
+  if(curDay===-1 && !bounds.length) DAYS.forEach((d,di)=>ROUTES[di].forEach(p=>p.forEach(c=>bounds.push(c))));
+}
+
 /* ---------------- 구글 시트 저장 (Apps Script 웹 앱) ----------------
    설정: 내 경로 → ☁ 구글 시트에 저장 → 웹 앱 주소·비밀 키 입력 (또는 ?gs=주소&gk=키 로 열기)
    저장할 때마다 시트에도 저장하고, 페이지를 열면 시트의 경로를 불러와 합칩니다(더 최근 것 우선). */
@@ -1493,6 +1716,12 @@ async function gsPull(){
   if(!j.ok) throw new Error(j.error || 'list');
   const list = savedList(); let n = 0;
   (j.routes||[]).forEach(r=>{
+    if(r && r.id===ACT_ID){ /* 확정 경로: 더 최근이고 이 기기에 저장 안 된 변경이 없을 때만 받아옴 */
+      if(Array.isArray(r.days) && r.days.length===DAYS.length && (+r.updated||0) > (ACT.updated||0) && !ACT.dirty){
+        ACT = { updated:+r.updated, dirty:false, days:actClean(r.days) }; LS.set(K_ACT, ACT); n++;
+      }
+      return;
+    }
     const days = r && sanitizeDays(r.days, r.v||1); if(!days || !r.id) return;
     const i = list.findIndex(x=>x.id===r.id);
     if(i >= 0){ if((+r.updated||0) > (list[i].updated||0)){ list[i] = { ...list[i], name:r.name, updated:+r.updated, days }; n++; } }
@@ -1554,7 +1783,9 @@ async function gsAction(a){
       toast(`구글 시트에 연결했어요${local.length ? ` · 이 기기 경로 ${local.length}개를 시트에 보냈어요` : ''}${n ? ` · 시트에서 ${n}개를 불러왔어요` : ''}`);
     }
     if(a==='gspull'){ const n = await gsPull(); toast(n ? `시트에서 경로 ${n}개를 불러왔어요` : '시트에 새로 불러올 경로가 없어요'); refresh(); }
-    if(a==='gspush'){ const list = savedList(); for(const r of list){ const j = await gsPost({ action:'save', route:{ v:PLAN_V, id:r.id, name:r.name, updated:r.updated, days:r.days } }); if(!j.ok) throw new Error(j.error); } toast(`경로 ${list.length}개를 구글 시트로 보냈어요`); }
+    if(a==='gspush'){ const list = savedList(); for(const r of list){ const j = await gsPost({ action:'save', route:{ v:PLAN_V, id:r.id, name:r.name, updated:r.updated, days:r.days } }); if(!j.ok) throw new Error(j.error); }
+      if(actCount()){ const j = await gsPost({ action:'save', route:{ v:PLAN_V, id:ACT_ID, name:ACT_NAME, updated:ACT.updated||Date.now(), days:ACT.days } }); if(!j.ok) throw new Error(j.error); }
+      toast(`경로 ${list.length}개${actCount() ? '와 확정 경로를' : '를'} 구글 시트로 보냈어요`); }
     if(a==='gsoff'){ if(!confirm('구글 시트 연결을 해제할까요? 시트에 저장된 내용은 그대로 남아요.')) return; LS.set(K_GS, null); toast('연결을 해제했어요'); }
   }catch(e){
     if(a==='gson') LS.set(K_GS, null);
