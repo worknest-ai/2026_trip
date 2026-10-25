@@ -254,6 +254,13 @@ if(typeof L === 'undefined'){
   .addp .agrp{ border:1px solid var(--line2); border-radius:12px; margin-bottom:10px; overflow:hidden; }
   .addp .ah{ font-size:12.5px; font-weight:800; padding:8px 11px; }
   .addp .gen .ah{ background:#3a1428; color:#ff9cc8; } .addp .meal .ah{ background:#33290f; color:#f3c55a; } .addp .stay .ah{ background:#331a25; color:#f08db0; }
+  .addp .user .ah{ background:#163329; color:#7ee0a1; } .tagk.user{ background:#163329; color:#7ee0a1; }
+  .uform{ display:flex; gap:6px; padding:9px 11px; border-top:1px solid #1f2839; flex-wrap:wrap; }
+  .uform select, .uform input{ background:#0e1420; color:#e8edf5; border:1px solid var(--line2); border-radius:8px; padding:8px 9px; font:inherit; font-size:14px; }
+  .uform input{ flex:1 1 180px; min-width:0; }
+  .ures .umsg{ padding:8px 11px; border-top:1px solid #1f2839; color:var(--tx2); font-size:13px; }
+  .gsbox{ margin-top:16px; padding-top:4px; border-top:1px dashed #2c3850; } .gsbox .gsp{ color:var(--tx2); font-size:13.5px; line-height:1.6; margin:6px 0 8px; }
+  .gsin{ display:block; width:100%; box-sizing:border-box; margin:0 0 8px; background:#0e1420; color:#e8edf5; border:1px solid var(--line2); border-radius:8px; padding:9px 10px; font:inherit; font-size:14px; }
   .addp .ar{ display:flex; gap:8px; align-items:center; padding:8px 11px; border-top:1px solid #1f2839; font-size:12.5px; }
   .addp .ar .a1{ flex:1; min-width:0; } .addp .ar .a1 b{ display:block; } .addp .ar .a1 span{ display:block; color:var(--tx3); font-size:11.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .rt{ border:1px solid var(--line2); border-radius:12px; padding:10px 12px; margin-top:10px; }
@@ -571,8 +578,8 @@ const DAYS = [
     {type:'drive', text:'보발재 → 영주 부석사 (영부로 · 935번 지방도)', d:'37km · 약 55분 · 고개를 넘는 굽은 산길이니 서행하세요. 단양읍으로 되돌아가는 길(약 75km · 1시간 40분)로 가면 노을을 놓칩니다'},
     {type:'spot', key:'buseoksa', t:'16:40', t2:'17:55',
       shift:{to:'오후 4:40~5:55 (일몰 직후 하산)', why:'원래 추천(오후 2:30~5시) 끝자락에 도착해 은행나무길을 지나 무량수전·안양루로 바로 올라가고(약 25분), 노을 명소라 일몰(17:39경)까지 안양루에 머뭅니다. 관람료는 무료이고 경내는 해 질 때까지 둘러볼 수 있지만 일몰 뒤 석계단은 조명이 적어요. 해가 지면 바로 내려와 17:55쯤 주차장에 닿도록 잡았습니다.'}},
-    {type:'drive', text:'부석사 → 안동 구시장 찜닭골목', d:'60km · 약 1시간 10분 (청송 가는 길에 있어 돌아가지 않아요)'},
-    {type:'meal', t:'19:05', name:'저녁 · 안동 구시장 찜닭골목', ds:'청송 가는 길에 있는 안동 시내에서 저녁을 먹습니다. 찜닭골목 식당들은 서로 붙어 있고, 세 곳 모두 10/26(월) 21시 이후까지 영업하는 것을 확인했어요(라스트오더 20:00~20:30). 주차는 안동 구시장 공영주차장을 이용하세요.', coord:[36.5656,128.7278], q:'안동 구시장 찜닭골목', rk:'m1d'},
+    {type:'drive', text:'부석사 → 안동 시내', d:'60km · 약 1시간 10분 (청송 가는 길에 있어 돌아가지 않아요)'},
+    {type:'meal', t:'19:05', name:'저녁 · 안동 1인 한식 (갈비·국밥·간고등어)', ds:'찜닭은 빼고 혼자 먹기 좋은 1인분 한식으로 다시 골랐어요. 카카오맵 후기 많은 순이고, 10/26(월) 19:05 이후에도 영업하는 곳만 남겼어요. 신라국밥·안동회관은 20:00에 닫으니 서두르고, 여유 있게 먹으려면 22시까지 하는 갈비·간고등어집으로 가세요.', coord:[36.5650,128.7290], q:'안동 한식', rk:'m1d'},
     {type:'drive', text:'안동 → 청송읍 (야간)', d:'43km · 약 45분'},
     {type:'stay', t:'숙박', name:'청송읍 모텔', ds:'20:45경 도착. 청송읍에는 객실 차고형 드라이브인 무인텔이 확인되지 않아, 야놀자에 "1실1주차"로 소개된 S모텔을 1순위로 골랐어요. 주산지까지 약 25분이고 내일도 10:00에 출발합니다.', coord:[36.4305,129.0561], q:'청송읍 숙박', rk:'s1'}
   ],
@@ -670,9 +677,11 @@ const RECS = {
     {name:'청풍면옥', kind:'냉면·만두국', menu:'물·비빔냉면 8,000원 · 사골떡만두국 7,000원 · 개성만두 8,000원', hours:'월 10:30~20:00', rating:'카카오 ★4.7 · 후기 20 · 블로그 21', addr:'충북 괴산군 괴산읍 읍내로2길 42', tel:'', url:KP(9501992), c:[36.80817,127.79254], why:'평점이 가장 높고 가벼운 한 그릇 메뉴', q:'괴산 청풍면옥'}
   ],
   m1d:[
-    {name:'종가찜닭', kind:'안동찜닭', menu:'안동찜닭(중) 32,000원 · 순살찜닭 36,000원 · 안동찜닭(대) 48,000원', hours:'월 10:00~21:30', rating:'카카오 ★4.7 · 후기 243 · 블로그 1,467', addr:'경북 안동시 번영길 11 1층', tel:'054-856-1313', url:KP(25466113), c:[36.56564,128.72776], why:'안동 구시장 찜닭골목에서 후기가 압도적으로 많음 · 21:30까지 영업이라 19시 도착에 여유', warn:'(중)이 2~3인분이라 혼자면 양이 많아요. 혼자라면 3순위 우정찜닭의 (소) 사이즈를 추천', q:'안동 종가찜닭'},
-    {name:'안동시골찜닭', kind:'안동찜닭', menu:'시골찜닭(중) 32,000원 · 조림닭(중) 32,000원', hours:'월 10:00~21:00 (라스트오더 20:00)', rating:'카카오 ★4.3 · 후기 114 · 블로그 1,042', addr:'경북 안동시 번영길 6', tel:'054-856-9977', url:KP(17030945), c:[36.56556,128.72736], why:'찜닭골목 후기 2위 · 종가찜닭 바로 옆', warn:'라스트오더 20:00', q:'안동시골찜닭'},
-    {name:'안동우정찜닭', kind:'안동찜닭', menu:'안동찜닭(소) 20,000원 · 안동찜닭(중) 32,000원 · 묵은지 쪼림닭(중) 35,000원', hours:'월 09:00~21:00 (라스트오더 20:30)', rating:'카카오 ★4.4 · 후기 81 · 블로그 85', addr:'경북 안동시 번영길 12 1층', tel:'054-854-0507', url:KP(23685466), c:[36.56545,128.72770], why:'찜닭골목에서 (소) 사이즈가 있어 혼자 먹기 가장 편함', q:'안동우정찜닭'}
+    {name:'안동한우갈비', kind:'한우갈비 · 1인분', menu:'생갈비(1인분) 32,000원 · 양념갈비(1인분) 32,000원 · 마늘갈비(1인분) 32,000원', hours:'월 11:00~22:00', rating:'카카오 ★4.0 · 후기 76 · 블로그 204', addr:'경북 안동시 경동로 677-10', tel:'054-857-6337', url:KP(7988641), c:[36.56366,128.73238], why:'안동 갈비골목에서 1인분 단위로 주문할 수 있는 집 중 후기가 가장 많음 · 22시까지 영업', q:'안동한우갈비'},
+    {name:'신라국밥', kind:'모듬국밥', menu:'모듬국밥(소) 9,000원 · 모듬국밥(중) 10,000원 · 수육정식 12,000원', hours:'월 10:00~20:00', rating:'카카오 ★4.7 · 후기 78 · 블로그 128', addr:'경북 안동시 서경지5길 45 1층', tel:'054-854-3135', url:KP(11120785), c:[36.55899,128.71497], why:'평점·후기 모두 높은 국밥집 · 한 그릇 메뉴', warn:'20:00에 닫아요. 19:10 전에 들어가세요 (구시장에서 차로 약 5분)', q:'안동 신라국밥'},
+    {name:'청하감자탕', kind:'뼈해장국', menu:'뼈해장국 8,000원 · 오삼불고기(200g) 12,000원', hours:'월 10:00~21:00 (브레이크 14:00~17:00)', rating:'카카오 ★4.4 · 후기 54 · 블로그 117', addr:'경북 안동시 태사길 138 1층', tel:'054-857-6164', url:KP(10842427), c:[36.56541,128.73850], why:'뼈해장국 1인분 · 21시까지 영업', q:'안동 청하감자탕'},
+    {name:'안동회관', kind:'소불고기', menu:'소불고기(1인분) 17,000원 · 돼지불고기(200g) 12,000원 · 메밀막국수 8,000원', hours:'월 10:30~20:00', rating:'카카오 ★4.7 · 후기 19 · 블로그 117', addr:'경북 안동시 태사길 71 1층', tel:'054-857-9555', url:KP(1050762246), c:[36.56654,128.73509], why:'1인분 소불고기 · 평점 높음', warn:'20:00에 닫아요. 19:10 전에 들어가세요', q:'안동회관 불고기'},
+    {name:'조가네간고등어정식', kind:'안동 간고등어 정식', menu:'간고등어정식 12,000원 · 된장찌개 8,000원', hours:'월 08:00~22:00', rating:'카카오 ★4.3 · 후기 58 · 블로그 14', addr:'경북 안동시 광석1길 47 1층', tel:'054-856-2566', url:KP(26620228), c:[36.56570,128.72351], why:'안동 명물 간고등어를 1인 정식으로 · 22시까지 영업이라 가장 여유 있음', q:'안동 조가네간고등어정식'}
   ],
   m2l:[
     {name:'부산식당', kind:'산채비빔밥·솥밥', menu:'산채비빔밥+솥밥 12,000원 · 도토리묵 12,000원', hours:'화 10:00~19:00', rating:'카카오 ★4.7 · 후기 26 · 블로그 83', addr:'경북 포항시 북구 송라면 보경로 457 1층 10호', tel:'054-262-6669', url:KP(24118285), c:[36.24507,129.31985], why:'보경사 식당가 후기 합계 1위 · 솥밥 곁들인 산채비빔밥 한 상', q:'보경사 부산식당'},
@@ -783,7 +792,8 @@ function kakaoView(){
     },
     fit(b){ const bb = new K.LatLngBounds(); b.forEach(c=>bb.extend(LL(c))); map.setBounds(bb, 50, 50, 50, 50); },
     fly(c){ map.setLevel(6, {animate:true}); map.panTo(LL(c)); },
-    resize(){ map.relayout(); }
+    resize(){ map.relayout(); },
+    pick(cb){ const h = e=>{ K.event.removeListener(map, 'click', h); cb([e.latLng.getLat(), e.latLng.getLng()]); }; K.event.addListener(map, 'click', h); }
   };
 }
 
@@ -811,7 +821,8 @@ function leafletView(){
     },
     fit(b){ map.fitBounds(L.latLngBounds(b), {padding:[36,36]}); },
     fly(c){ map.flyTo(c, 13, {duration:.6}); },
-    resize(){ map.invalidateSize(); }
+    resize(){ map.invalidateSize(); },
+    pick(cb){ map.once('click', e=>cb([e.latlng.lat, e.latlng.lng])); }
   };
 }
 
@@ -1054,7 +1065,8 @@ let PLAN = sanitizePlan(LS.get(K_DRAFT, null)) || blankPlan();
 function blankPlan(){ return { v:PLAN_V, id:null, name:'기본 일정', dirty:false, days:DAYS.map(()=>null) }; }
 function sanitizeDays(days, v = PLAN_V){
   if(!Array.isArray(days) || days.length !== DAYS.length) return null;
-  return days.map((st,di)=> Array.isArray(st) && !(v < 10) ? st.filter(s=> s && ((s.k==='b' && DAYS[di].items[s.i] && DAYS[di].items[s.i].type!=='drive') || (s.k==='g' && SPOTS[s.key]))) : null);
+  return days.map((st,di)=> Array.isArray(st) && !(v < 10) ? st.filter(s=> s && ((s.k==='b' && DAYS[di].items[s.i] && DAYS[di].items[s.i].type!=='drive') || (s.k==='g' && SPOTS[s.key])
+    || (s.k==='u' && s.name && Array.isArray(s.c) && s.c.length===2 && ['spot','meal','stay'].includes(s.cat)))) : null);
 }
 function sanitizePlan(p){ const days = p && sanitizeDays(p.days, p.v||1); return days ? { v:PLAN_V, id:p.id||null, name:p.name||'기본 일정', dirty:!!p.dirty, days } : null; }
 function touch(){ PLAN.dirty = true; LS.set(K_DRAFT, PLAN); }
@@ -1071,10 +1083,16 @@ function stopsOf(di){ return PLAN.days[di] || baseStops(di); }
 function recCoord(rec, fb){ return rec.c || GEO[rec.name] || fb; }
 function stayInfo(di){
   const st = stopsOf(di);
-  for(let j=st.length-1; j>=0; j--){ const s = st[j]; if(s.k==='b' && DAYS[di].items[s.i].type==='stay') return stopInfo(di, s); }
+  for(let j=st.length-1; j>=0; j--){ const s = st[j]; if((s.k==='b' && DAYS[di].items[s.i].type==='stay') || (s.k==='u' && s.cat==='stay')) return stopInfo(di, s); }
   return null;
 }
+/* 직접 추가한 장소: {k:'u', cat:'spot'|'meal'|'stay', name, addr, c:[lat,lon], url?, dwell?} */
+const UCAT = { spot:{kind:'gen', label:'명소', ic:'📍', dwell:60}, meal:{kind:'meal', label:'식당', ic:'🍽', dwell:50}, stay:{kind:'stay', label:'숙소', ic:'🏨', dwell:0} };
 function stopInfo(di, s){
+  if(s.k==='u'){
+    const u = UCAT[s.cat];
+    return { kind:u.kind, u:s, name:esc(s.name), coord:s.c, dwell: s.cat==='stay' ? 0 : (s.dwell ?? u.dwell), hold:null, sub:`✍ 직접 추가 · ${esc(s.addr||'')}` };
+  }
   if(s.k==='g'){
     const p = SPOTS[s.key];
     return { kind:'gen', name:p.name, coord:p.coord, dwell:s.dwell ?? walkMin(p.walk), hold:null, sub:`${p.ic} ${p.kind} · 왕복 ${p.walk}`, key:s.key };
@@ -1082,7 +1100,7 @@ function stopInfo(di, s){
   const it = DAYS[di].items[s.i];
   if(it.type==='start'){
     const prev = di>0 ? stayInfo(di-1) : null;
-    return { kind:'start', name: prev && prev.rec ? `${prev.rec.name} 출발` : it.name, coord: prev ? prev.coord : it.coord, dwell:0, hold:toMin(s.t || it.t), sub:it.ds, it };
+    return { kind:'start', name: prev && (prev.rec || prev.u) ? `${prev.rec ? prev.rec.name : prev.name} 출발` : it.name, coord: prev ? prev.coord : it.coord, dwell:0, hold:toMin(s.t || it.t), sub:it.ds, it };
   }
   if(it.type==='spot'){
     const p = SPOTS[it.key];
@@ -1169,7 +1187,8 @@ function drawCustom(di, bounds){
   (d.near||[]).filter(nr=>!infos.some(x=>x.key===nr.key)).forEach(nr=>{ addGen(nr, di); bounds.push(SPOTS[nr.key].coord); });
 }
 function openStop(di, x){
-  if(x.kind==='spot' || x.kind==='gen') openSpot(x.key, di);
+  if(x.u) openCustom(di, x);
+  else if(x.kind==='spot' || x.kind==='gen') openSpot(x.key, di);
   else if(x.it && (x.kind==='meal' || x.kind==='stay' || x.kind==='opt' || x.kind==='market')) openPlace(x.it, di);
 }
 
@@ -1191,13 +1210,14 @@ function planBar(){
     <div class="pl1"><span class="pn">📁 ${esc(PLAN.name)}${PLAN.dirty ? ' <em>· 저장 안 됨</em>' : ''}</span>
       <button class="pbtn" data-p="save">💾 저장</button><button class="pbtn" data-p="list">📂 내 경로${n ? ` ${n}` : ''}</button></div>
     ${curDay>=0 ? `<div class="pl2"><button class="pbtn${editMode?' on':''}" data-p="edit">${editMode ? '✔ 편집 끝내기' : '✏️ 경로 편집 · 장소 추가'}</button>${PLAN.days[curDay] ? '<button class="pbtn" data-p="reset">↺ 이 날 기본 일정으로</button>' : ''}</div>` : ''}
-    ${curDay>=0 && editMode ? '<div class="phint">▲▼ 순서 바꾸기 · ✕ 빼기 · −/＋ 머무는 시간. 바꾸면 이후 도착 시각이 자동으로 다시 계산돼요. 맨 아래에서 일반 명소·맛집·숙소를 경로에 추가하세요.</div>' : ''}
+    ${curDay>=0 && editMode ? '<div class="phint">▲▼ 순서 바꾸기 · ✕ 빼기 · −/＋ 머무는 시간. 바꾸면 이후 도착 시각이 자동으로 다시 계산돼요. 맨 아래에서 <b>업체명·주소로 직접 추가</b>하거나, 일반 명소·맛집·숙소를 골라 넣으세요.</div>' : ''}
   </div>`;
 }
 function bindPlanBar(){ $('pbody').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>planAction(b.dataset.p)); }
 /* 편집했지만 기본 일정과 같고 전날 숙소도 그대로면 기본 일정으로 되돌림 */
 function pristine(di){
-  return JSON.stringify(PLAN.days[di]) === JSON.stringify(baseStops(di)) && !(di>0 && PLAN.days[di-1] && (stayInfo(di-1)||{}).rec);
+  const ps = di>0 && PLAN.days[di-1] ? (stayInfo(di-1)||{}) : {};
+  return JSON.stringify(PLAN.days[di]) === JSON.stringify(baseStops(di)) && !(ps.rec || ps.u);
 }
 function tidy(di){ if(di>=0 && PLAN.days[di] && pristine(di)){ PLAN.days[di] = null; LS.set(K_DRAFT, PLAN); } }
 function planAction(a){
@@ -1252,15 +1272,16 @@ function paintCustom(di, res){
     if((x.kind==='spot' || x.kind==='gen') && sunset && x.arr >= sunset) note += `<div class="lateN">🌙 일몰(${fmt(sunset)}) 뒤에 도착해요. 어두워서 둘러보기 어려울 수 있어요.</div>`;
     else if(x.kind==='gen' && sunset && x.dep > sunset + 20) note += `<div class="lateN">🌙 일몰(${fmt(sunset)}) 뒤까지 머물러요. 하산·귀로가 어두울 수 있어요.</div>`;
     let picks = '';
-    if((x.kind==='meal' || x.kind==='stay') && x.it.rk){
+    if((x.kind==='meal' || x.kind==='stay') && x.it && x.it.rk){
       const st = PLAN.days[di][j];
       picks = `<div class="picks">${(RECS[x.it.rk]||[]).map((r,ri)=>`<button class="pbtn${st.pick===ri?' on':''}" data-pick="${ri}" data-j="${j}">${ri+1} ${r.name}</button>`).join('')}${ed ? `<button class="pbtn${st.pick==null?' on':''}" data-pick="" data-j="${j}">미정</button>` : ''}</div>`;
       if(!ed && st.pick==null) picks = `<div class="recs">${(RECS[x.it.rk]||[]).map((r,ri)=>`<div class="rc"><b>${ri+1}</b>${r.name}${r.isNew?`<i class="newb">🆕 신축</i>`:''}<span>${recShort(r)}</span></div>`).join('')}</div>`;
     }
-    const ctl = ed && x.kind!=='stay' ? `<div class="ctl"><button class="pbtn" data-a="up" data-j="${j}" title="위로">▲</button><button class="pbtn" data-a="dn" data-j="${j}" title="아래로">▼</button><button class="pbtn del" data-a="del" data-j="${j}">✕ 빼기</button>
+    const ctl = ed && x.kind==='stay' && x.u ? `<div class="ctl"><button class="pbtn del" data-a="del" data-j="${j}">✕ 빼기</button><span style="color:var(--tx3)">빼면 이 날은 숙소가 비어요. 기본 숙소로 되돌리려면 위의 ↺ 버튼을 누르세요.</span></div>`
+      : ed && x.kind!=='stay' ? `<div class="ctl"><button class="pbtn" data-a="up" data-j="${j}" title="위로">▲</button><button class="pbtn" data-a="dn" data-j="${j}" title="아래로">▼</button><button class="pbtn del" data-a="del" data-j="${j}">✕ 빼기</button>
       <span class="dw">머무름 <button class="pbtn" data-a="dw-" data-j="${j}">−</button><b>${dur(x.dwell)}</b><button class="pbtn" data-a="dw+" data-j="${j}">＋</button></span></div>` : '';
     h += `<div class="it" id="it-c${j}"><div class="tm">${tm}</div>
-      <div class="card stop ${x.kind}"><div class="click" data-o="${j}"><div class="t1">${num}<span class="tagk ${x.kind}">${tag[x.kind]}</span>${x.name}</div><div class="t2">${x.sub||''}</div></div>${note}${picks}${ctl}</div></div>`;
+      <div class="card stop ${x.kind}"><div class="click" data-o="${j}"><div class="t1">${num}<span class="tagk ${x.u ? 'user' : x.kind}">${x.u ? '✍ 직접 추가 · '+UCAT[x.u.cat].label : tag[x.kind]}</span>${x.name}</div><div class="t2">${x.sub||''}</div></div>${note}${picks}${ctl}</div></div>`;
   });
   h += '</div>';
   if(ed) h += addPanel(di, L);
@@ -1273,12 +1294,110 @@ function paintCustom(di, res){
   pb.querySelectorAll('[data-a]').forEach(el=>el.onclick=()=>editAction(el.dataset.a, +el.dataset.j));
   pb.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>pickRec(+el.dataset.j, el.dataset.pick==='' ? null : +el.dataset.pick));
   pb.querySelectorAll('[data-add]').forEach(el=>el.onclick=()=>addStop(el.dataset.add));
+  if(ed) bindUserAdd(di, L);
+}
+
+/* ---------------- 직접 추가: 업체명·주소 검색 → 경로에 넣기 ----------------
+   카카오맵 SDK(장소·주소 검색)를 쓸 수 있으면 카카오, 아니면 OpenStreetMap(Nominatim) 검색.
+   못 찾으면 지도에서 위치를 직접 찍어 추가. */
+const USR = { q:'', cat:'spot', list:[], busy:false, msg:'' };
+function userResHtml(di, distTo){
+  if(USR.busy) return '<div class="umsg">🔎 검색 중…</div>';
+  let h = USR.msg ? `<div class="umsg">${USR.msg}</div>` : '';
+  h += USR.list.map((p,i)=>`<div class="ar"><div class="a1"><b>${esc(p.name)}</b><span>${esc(p.addr||'')}${p.cat ? ' · '+esc(p.cat) : ''} · 경로에서 약 ${Math.round(distTo(p.c))}km · ${p.src}</span></div><button class="pbtn on" data-u="${i}">＋ 추가</button></div>`).join('');
+  if(USR.q && !USR.busy) h += `<div class="ar"><div class="a1"><b>🗺 지도에서 위치 찍기</b><span>검색이 안 되면 지도를 눌러 "${esc(USR.q)}" 위치를 직접 정해요</span></div><button class="pbtn" id="uPick">지도에서 찍기</button></div>`;
+  return h;
+}
+function bindUserAdd(di, L){
+  const q = $('uQ'), cat = $('uCat'), go = $('uGo'); if(!q) return;
+  const pts = L.map(x=>x.coord), distTo = c => Math.min(...pts.map(p=>hav(p, c)));
+  const paint = ()=>{ const r = $('uRes'); if(r){ r.innerHTML = userResHtml(di, distTo); bindRes(); } };
+  const bindRes = ()=>{
+    $('pbody').querySelectorAll('[data-u]').forEach(el=>el.onclick=()=>addUser(di, USR.list[+el.dataset.u], cat.value));
+    const pk = $('uPick'); if(pk) pk.onclick = ()=>pickOnMap(di, cat.value);
+  };
+  cat.onchange = ()=>{ USR.cat = cat.value; };
+  const run = async ()=>{
+    USR.q = q.value.trim(); USR.cat = cat.value; if(!USR.q) return;
+    USR.busy = true; USR.msg = ''; paint();
+    try{ USR.list = await searchPlace(USR.q, pts); }catch(e){ USR.list = []; }
+    USR.busy = false;
+    USR.list.sort((a,b)=>distTo(a.c)-distTo(b.c));
+    USR.msg = USR.list.length ? '' : '검색 결과가 없어요. 주소는 "시·군 + 도로명 + 번지"로 넣어 보거나, 아래에서 지도에 직접 찍어 주세요.';
+    paint();
+  };
+  go.onclick = run;
+  q.onkeydown = e=>{ if(e.key==='Enter'){ e.preventDefault(); run(); } };
+  bindRes();
+}
+async function searchPlace(q, near){
+  const out = [];
+  const S = window.kakao && kakao.maps && kakao.maps.services;
+  if(S){
+    const ctr = near && near.length ? near[Math.floor(near.length/2)] : null;
+    const opt = ctr ? { size:10, location:new kakao.maps.LatLng(ctr[0], ctr[1]), sort:S.SortBy.ACCURACY } : { size:10 };
+    const kw = await new Promise(r=>new S.Places().keywordSearch(q, (res, st)=>r(st===S.Status.OK ? res : []), opt));
+    kw.forEach(p=>out.push({ name:p.place_name, addr:p.road_address_name || p.address_name, cat:(p.category_name||'').split(' > ').pop(), c:[+p.y, +p.x], url:p.place_url, src:'카카오맵' }));
+    const ad = await new Promise(r=>new S.Geocoder().addressSearch(q, (res, st)=>r(st===S.Status.OK ? res : [])));
+    ad.slice(0,3).forEach(a=>out.push({ name:q, addr:(a.road_address && a.road_address.address_name) || a.address_name, cat:'주소', c:[+a.y, +a.x], src:'카카오 주소' }));
+  }
+  if(!out.length){
+    const ctl = new AbortController(), tm = setTimeout(()=>ctl.abort(), 9000);
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=kr&accept-language=ko&limit=8&q=${encodeURIComponent(q)}`, { signal:ctl.signal });
+    clearTimeout(tm);
+    (await r.json()).forEach(p=>out.push({ name:p.name || q, addr:p.display_name, cat:p.type || '', c:[+p.lat, +p.lon], src:'OpenStreetMap' }));
+  }
+  return out;
+}
+function addUser(di, p, cat){
+  if(!p) return;
+  const st = PLAN.days[di], s = { k:'u', cat, name:p.name, addr:p.addr || '', c:[+(+p.c[0]).toFixed(6), +(+p.c[1]).toFixed(6)] };
+  if(p.url) s.url = p.url;
+  if(cat==='stay'){
+    for(let j=st.length-1; j>=0; j--){ const t = st[j]; if((t.k==='b' && DAYS[di].items[t.i].type==='stay') || (t.k==='u' && t.cat==='stay')) st.splice(j, 1); }
+    let end = st.findIndex(t=>t.k==='b' && DAYS[di].items[t.i].type==='end'); if(end < 0) end = st.length;
+    st.splice(end, 0, s); linkNextDay(di);
+    toast(`${p.name}을(를) 오늘 숙소로 정했어요 · 내일 출발지도 바뀌어요`);
+  } else {
+    st.splice(bestPos(st, di, s.c), 0, s);
+    toast(`${p.name}을(를) 경로에 넣었어요`);
+  }
+  USR.list = []; USR.msg = ''; USR.q = '';
+  touch(); refresh();
+}
+function pickOnMap(di, cat){
+  if(!HAS_MAP || !MV.pick){ toast('지도를 불러오지 못해 위치를 찍을 수 없어요'); return; }
+  const name = USR.q || '내 장소';
+  toast('지도에서 위치를 눌러 주세요');
+  try{ document.getElementById('map').scrollIntoView({ behavior:'smooth', block:'start' }); }catch(e){}
+  MV.pick(c=>addUser(di, { name, addr:`지도에서 찍은 위치 (${c[0].toFixed(5)}, ${c[1].toFixed(5)})`, c }, cat));
+}
+function openCustom(di, x){
+  const d = DAYS[di], s = x.u, u = UCAT[s.cat];
+  $('mk').innerHTML = `${u.ic} 직접 추가한 ${u.label} · <span style="color:${d.color}">${di+1}일차 ${d.date}</span>`;
+  $('mt').textContent = s.name;
+  const nav = `https://map.kakao.com/link/to/${encodeURIComponent(s.name)},${s.c[0]},${s.c[1]}`;
+  $('mb').innerHTML = `<div class="mcontent" style="padding-top:16px">
+      <div class="mrow"><span class="k">주소</span><span class="v">${esc(s.addr||'')}</span></div>
+      ${x.arr!=null ? `<div class="mrow"><span class="k">도착</span><span class="v">${fmt(x.arr)}${s.cat!=='stay' ? ` ~ ${fmt(x.dep)}` : ''}</span></div>` : ''}
+    </div>
+    <div class="mbtns">${s.url ? `<a class="mbtn go" href="${s.url}" target="_blank" rel="noopener">카카오맵 정보</a>` : ''}<a class="mbtn" href="${nav}" target="_blank" rel="noopener">카카오맵 길찾기</a>${mapLinks(s.name)}</div>
+    <div class="credit">직접 추가한 장소예요. 영업시간·휴무는 방문 전에 확인하세요. 경로 편집에서 ▲▼·✕·머무는 시간을 바꿀 수 있어요.</div>`;
+  MODAL.classList.add('open'); document.body.style.overflow = 'hidden';
+  if(HAS_MAP) MV.fly(s.c);
 }
 function addPanel(di, L){
   const st = PLAN.days[di], pts = L.map(x=>x.coord);
   const distTo = c => Math.min(...pts.map(p=>hav(p, c)));
   const gens = Object.keys(SPOTS).filter(k=>SPOTS[k].pick!=='codex').sort((a,b)=>distTo(SPOTS[a].coord)-distTo(SPOTS[b].coord));
   let h = '<div class="addp"><div class="sect">＋ 경로에 추가하기</div>';
+  h += `<div class="agrp user"><div class="ah">✍ 업체명·주소로 직접 추가 · 명소·식당·숙소</div>
+    <div class="uform">
+      <select id="uCat">${Object.entries(UCAT).map(([k,u])=>`<option value="${k}"${USR.cat===k?' selected':''}>${u.ic} ${u.label}</option>`).join('')}</select>
+      <input id="uQ" type="search" enterkeyhint="search" placeholder="업체명 또는 주소 (예: 안동 맘모스제과 · 경북 안동시 번영길 11)" value="${esc(USR.q)}">
+      <button class="pbtn on" id="uGo">검색</button>
+    </div>
+    <div id="uRes" class="ures">${userResHtml(di, distTo)}</div></div>`;
   h += '<div class="agrp gen"><div class="ah">📍 일반 명소 · 경로와 가까운 순</div>' + gens.map(k=>{
     const p = SPOTS[k], has = st.some(s=>s.k==='g' && s.key===k);
     return `<div class="ar"><div class="a1"><b>${p.name}</b><span>경로에서 약 ${Math.round(distTo(p.coord))}km · ${p.kind} · 왕복 ${p.walk}</span></div><button class="pbtn${has?'':' on'}" data-add="g:${k}" ${has?'disabled':''}>${has ? '추가됨' : '＋ 추가'}</button></div>`;
@@ -1346,11 +1465,80 @@ function savedList(){
     .map(r=>({ ...r, days:sanitizeDays(r.days, r.v||1), v:PLAN_V }));
 }
 function changedDays(days){ const c = days.map((d,i)=>d ? i+1 : 0).filter(Boolean); return c.length ? `${c.join('·')}일차 수정` : '기본 일정과 같음'; }
+/* ---------------- 구글 시트 저장 (Apps Script 웹 앱) ----------------
+   설정: 내 경로 → ☁ 구글 시트에 저장 → 웹 앱 주소·비밀 키 입력 (또는 ?gs=주소&gk=키 로 열기)
+   저장할 때마다 시트에도 저장하고, 페이지를 열면 시트의 경로를 불러와 합칩니다(더 최근 것 우선). */
+const K_GS = 'trip26.gsheet';
+const gsCfg = ()=> LS.get(K_GS, null);
+async function gsGet(params){
+  const c = gsCfg(), ctl = new AbortController(), tm = setTimeout(()=>ctl.abort(), 15000);
+  try{ return await (await fetch(c.url + '?' + new URLSearchParams({ ...params, key:c.key }), { signal:ctl.signal })).json(); }
+  finally{ clearTimeout(tm); }
+}
+async function gsPost(body){
+  const c = gsCfg(), ctl = new AbortController(), tm = setTimeout(()=>ctl.abort(), 20000);
+  try{ return await (await fetch(c.url, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify({ ...body, key:c.key }), signal:ctl.signal })).json(); }
+  finally{ clearTimeout(tm); }
+}
+function gsPush(route){
+  if(!gsCfg() || !route) return;
+  gsPost({ action:'save', route:{ v:PLAN_V, id:route.id, name:route.name, updated:route.updated, days:route.days } })
+    .then(j=>toast(j.ok ? '☁ 구글 시트에도 저장했어요' : `구글 시트 저장 실패 (${j.error||'오류'})`))
+    .catch(()=>toast('구글 시트에 연결하지 못했어요 · 이 기기에는 저장됐어요'));
+}
+async function gsPull(){
+  const j = await gsGet({ action:'list' });
+  if(!j.ok) throw new Error(j.error || 'list');
+  const list = savedList(); let n = 0;
+  (j.routes||[]).forEach(r=>{
+    const days = r && sanitizeDays(r.days, r.v||1); if(!days || !r.id) return;
+    const i = list.findIndex(x=>x.id===r.id);
+    if(i >= 0){ if((+r.updated||0) > (list[i].updated||0)){ list[i] = { ...list[i], name:r.name, updated:+r.updated, days }; n++; } }
+    else { list.push({ v:PLAN_V, id:String(r.id), name:String(r.name||'시트 경로'), updated:+r.updated||Date.now(), days }); n++; }
+  });
+  list.sort((a,b)=>(b.updated||0)-(a.updated||0));
+  LS.set(K_SAVED, list);
+  return n;
+}
+function gsBox(){
+  const c = gsCfg();
+  return `<div class="gsbox"><div class="sect">☁ 구글 시트에 저장</div>${c
+    ? `<p class="gsp">연결됨 · 💾 저장할 때마다 구글 드라이브의 시트에도 함께 저장되고, 다른 기기에서도 불러올 수 있어요.</p>
+       <div class="rbtns"><button class="mbtn" data-r="gspull">⬇ 시트에서 불러오기</button><button class="mbtn" data-r="gspush">⬆ 저장된 경로 모두 보내기</button><button class="mbtn" data-r="gsoff">연결 해제</button></div>`
+    : `<p class="gsp">구글 시트의 Apps Script 웹 앱 주소와 비밀 키를 넣으면, 저장한 경로가 구글 드라이브의 시트에도 저장돼요.</p>
+       <input class="gsin" id="gsUrl" placeholder="https://script.google.com/macros/s/…/exec"><input class="gsin" id="gsKey" placeholder="비밀 키">
+       <div class="rbtns"><button class="mbtn go" data-r="gson">연결하기</button></div>`}</div>`;
+}
+async function gsAction(a){
+  try{
+    if(a==='gson'){
+      const url = ($('gsUrl').value||'').trim(), key = ($('gsKey').value||'').trim();
+      if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(url) || !key) return alert('웹 앱 주소(https://script.google.com/macros/s/…/exec)와 비밀 키를 모두 넣어 주세요.');
+      LS.set(K_GS, { url, key });
+      const j = await gsGet({ action:'ping' });
+      if(!j.ok){ LS.set(K_GS, null); return alert(j.error==='key' ? '비밀 키가 맞지 않아요.' : '연결하지 못했어요. 웹 앱 배포 설정(액세스: 모든 사용자)을 확인해 주세요.'); }
+      const n = await gsPull(); toast(`구글 시트에 연결했어요${n ? ` · 경로 ${n}개를 불러왔어요` : ''}`);
+    }
+    if(a==='gspull'){ const n = await gsPull(); toast(n ? `시트에서 경로 ${n}개를 불러왔어요` : '시트에 새로 불러올 경로가 없어요'); refresh(); }
+    if(a==='gspush'){ const list = savedList(); for(const r of list){ const j = await gsPost({ action:'save', route:{ v:PLAN_V, id:r.id, name:r.name, updated:r.updated, days:r.days } }); if(!j.ok) throw new Error(j.error); } toast(`경로 ${list.length}개를 구글 시트로 보냈어요`); }
+    if(a==='gsoff'){ if(!confirm('구글 시트 연결을 해제할까요? 시트에 저장된 내용은 그대로 남아요.')) return; LS.set(K_GS, null); toast('연결을 해제했어요'); }
+  }catch(e){ alert('구글 시트와 통신하지 못했어요. 인터넷 연결과 웹 앱 주소를 확인해 주세요.'); }
+  openRoutes();
+}
+/* 주소창에 ?gs=웹앱주소&gk=키 를 붙여 열면 연결 정보를 저장하고 주소에서 지움 (휴대폰 설정용) */
+(function(){
+  try{
+    const q = new URLSearchParams(location.search), url = q.get('gs'), key = q.get('gk');
+    if(url && key){ LS.set(K_GS, { url, key }); history.replaceState(null, '', location.pathname + location.hash); }
+    if(gsCfg()) gsPull().then(n=>{ if(n){ toast(`☁ 구글 시트에서 경로 ${n}개를 불러왔어요`); } }).catch(()=>{});
+  }catch(e){}
+})();
+
 function savePlan(asNew){
   const list = savedList();
   if(PLAN.id && !asNew){
     const r = list.find(r=>r.id===PLAN.id);
-    if(r){ r.days = PLAN.days; r.updated = Date.now(); LS.set(K_SAVED, list); PLAN.dirty = false; LS.set(K_DRAFT, PLAN); toast(`'${PLAN.name}'에 저장했어요`); return refresh(); }
+    if(r){ r.days = PLAN.days; r.updated = Date.now(); LS.set(K_SAVED, list); PLAN.dirty = false; LS.set(K_DRAFT, PLAN); toast(`'${PLAN.name}'에 저장했어요`); gsPush(r); return refresh(); }
   }
   const name = (prompt('저장할 경로 이름을 적어 주세요', PLAN.id ? PLAN.name+' (사본)' : `내 경로 ${list.length+1}`) || '').trim();
   if(!name) return;
@@ -1358,7 +1546,7 @@ function savePlan(asNew){
   list.unshift({ v:PLAN_V, id, name, updated:Date.now(), days:PLAN.days });
   if(!LS.set(K_SAVED, list)) return alert('이 브라우저에서는 저장할 수 없어요(사생활 보호 모드 등). "파일로 내보내기"를 이용해 주세요.');
   PLAN = { v:PLAN_V, id, name, dirty:false, days:PLAN.days }; LS.set(K_DRAFT, PLAN);
-  toast(`'${name}'(으)로 저장했어요`);
+  toast(`'${name}'(으)로 저장했어요`); gsPush(list[0]);
   if(MODAL.classList.contains('open')) openRoutes();
   refresh();
 }
@@ -1368,7 +1556,7 @@ function loadPlan(p){
 }
 function openRoutes(){
   const list = savedList();
-  $('mk').textContent = '내 경로 · 이 기기 브라우저에 저장돼요';
+  $('mk').textContent = gsCfg() ? '내 경로 · 이 기기 + 구글 시트에 저장돼요' : '내 경로 · 이 기기 브라우저에 저장돼요';
   $('mt').textContent = '저장된 경로';
   const when = t => new Date(t).toLocaleString('ko-KR', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
   $('mb').innerHTML = `<div class="mcontent" style="padding-top:14px;padding-bottom:4px">
@@ -1379,6 +1567,7 @@ function openRoutes(){
           <div class="rt3"><button class="pbtn on" data-r="load" data-id="${r.id}">불러오기</button><button class="pbtn" data-r="ren" data-id="${r.id}">이름 변경</button><button class="pbtn del" data-r="del" data-id="${r.id}">삭제</button></div>
         </div>`).join('') : '<p class="empty">아직 저장한 경로가 없어요. 일차 화면에서 <b>✏️ 경로 편집</b>으로 장소를 넣거나 순서를 바꾼 뒤 <b>💾 저장</b>을 누르세요.</p>'}
       <div class="rbtns" style="margin-top:14px"><button class="mbtn" data-r="exp" ${list.length?'':'disabled'}>⬇ 파일로 내보내기</button><label class="mbtn">⬆ 파일 가져오기<input type="file" accept=".json,application/json" id="impf" hidden></label></div>
+      ${gsBox()}
     </div>
     <div class="credit">저장한 경로를 불러온 뒤 편집하고 💾 저장을 누르면 그 경로에 덮어써요. 다른 기기(휴대폰 등)에서 쓰려면 파일로 내보낸 뒤 그 기기에서 가져오세요.</div>`;
   $('mb').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>routeAction(b.dataset.r, b.dataset.id));
@@ -1387,18 +1576,20 @@ function openRoutes(){
 }
 function routeAction(a, id){
   const list = savedList(), r = list.find(r=>r.id===id);
+  if(a.startsWith('gs')) return gsAction(a);
   if(a==='new') return savePlan(true);
   if(a==='base'){ if(loadPlan(blankPlan())) closeModal(); return; }
   if(a==='load' && r){ if(loadPlan({ v:PLAN_V, id:r.id, name:r.name, dirty:false, days:r.days })){ closeModal(); toast(`'${r.name}'을(를) 불러왔어요`); } return; }
   if(a==='ren' && r){
     const name = (prompt('새 이름', r.name) || '').trim(); if(!name) return;
-    r.name = name; LS.set(K_SAVED, list);
+    r.name = name; r.updated = Date.now(); LS.set(K_SAVED, list); gsPush(r);
     if(PLAN.id===id){ PLAN.name = name; LS.set(K_DRAFT, PLAN); refresh(); }
     return openRoutes();
   }
   if(a==='del' && r){
     if(!confirm(`'${r.name}' 경로를 삭제할까요? 되돌릴 수 없어요.`)) return;
     LS.set(K_SAVED, list.filter(x=>x.id!==id));
+    if(gsCfg()) gsPost({ action:'delete', id }).catch(()=>toast('구글 시트에서는 지우지 못했어요'));
     if(PLAN.id===id){ PLAN.id = null; PLAN.dirty = PLAN.days.some(Boolean); LS.set(K_DRAFT, PLAN); refresh(); }
     toast('삭제했어요'); return openRoutes();
   }
