@@ -1512,8 +1512,19 @@ function gsBox(){
 async function gsAction(a){
   try{
     if(a==='gson'){
-      const url = ($('gsUrl').value||'').trim(), key = ($('gsKey').value||'').trim();
-      if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(url) || !key) return alert('웹 앱 주소(https://script.google.com/macros/s/…/exec)와 비밀 키를 모두 넣어 주세요.');
+      let url = ($('gsUrl').value||'').replace(/[\s"'<>]/g, '');
+      const key = ($('gsKey').value||'').trim();
+      /* 배포 ID(AKfy…)만 넣었으면 웹 앱 주소로 바꿔 줌 · https:// 빠진 주소도 허용 */
+      if(/^AKfy[\w-]{20,}$/.test(url)) url = `https://script.google.com/macros/s/${url}/exec`;
+      if(url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+      url = url.replace(/^http:/i, 'https:');
+      if(!url) return alert('웹 앱 주소 칸이 비어 있어요.\nApps Script의 [배포 → 배포 관리]에서 "웹 앱 URL"(https://script.google.com/macros/s/…/exec)을 복사해 넣어 주세요.');
+      if(!key) return alert('비밀 키 칸이 비어 있어요.\nApps Script 맨 위 SECRET 값(따옴표 안의 글자)을 그대로 넣어 주세요.');
+      if(/^https:\/\/script\.google\.com\/(home|d\/)/.test(url) || /\/edit(\?|#|$)/.test(url))
+        return alert('이 주소는 Apps Script 편집 화면 주소예요.\n[배포 → 배포 관리]에서 "웹 앱"의 URL(…/exec로 끝나는 주소)을 복사해 주세요.');
+      if(/\/dev(\?|$)/.test(url)) return alert('…/dev 로 끝나는 주소는 테스트용이라 연결되지 않아요.\n[배포 → 배포 관리]의 웹 앱 URL(…/exec)을 넣어 주세요.');
+      if(!/^https:\/\/script\.google(usercontent)?\.com\/.*\/exec(\?|$)/.test(url))
+        return alert(`웹 앱 주소가 아니에요:\n${url.slice(0, 80)}\n\n[배포 → 배포 관리]에서 "웹 앱 URL"(https://script.google.com/macros/s/…/exec)을 복사해 주세요.\n주소와 비밀 키 칸이 바뀌지 않았는지도 확인해 주세요.`);
       LS.set(K_GS, { url, key });
       const j = await gsGet({ action:'ping' });
       if(!j.ok){ LS.set(K_GS, null); return alert(j.error==='key' ? '비밀 키가 맞지 않아요.\n스크립트의 SECRET 값과 같은지, SECRET을 바꾼 뒤 [배포 → 배포 관리 → 수정 → 새 버전]으로 다시 배포했는지 확인해 주세요.' : '연결하지 못했어요. 웹 앱 배포 설정(액세스: 모든 사용자)을 확인해 주세요.'); }
