@@ -1483,7 +1483,7 @@ async function gsPost(body){
 function gsPush(route){
   if(!gsCfg() || !route) return;
   gsPost({ action:'save', route:{ v:PLAN_V, id:route.id, name:route.name, updated:route.updated, days:route.days } })
-    .then(j=>toast(j.ok ? '☁ 구글 시트에도 저장했어요' : `구글 시트 저장 실패 (${j.error||'오류'})`))
+    .then(j=>toast(j.ok ? '☁ 구글 시트에도 저장했어요' : j.error==='key' ? '구글 시트 저장 실패 · 비밀 키가 달라요 (스크립트를 고쳤다면 새 버전으로 다시 배포)' : `구글 시트 저장 실패 (${j.error||'오류'})`))
     .catch(()=>toast('구글 시트에 연결하지 못했어요 · 이 기기에는 저장됐어요'));
 }
 async function gsPull(){
@@ -1516,13 +1516,20 @@ async function gsAction(a){
       if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(url) || !key) return alert('웹 앱 주소(https://script.google.com/macros/s/…/exec)와 비밀 키를 모두 넣어 주세요.');
       LS.set(K_GS, { url, key });
       const j = await gsGet({ action:'ping' });
-      if(!j.ok){ LS.set(K_GS, null); return alert(j.error==='key' ? '비밀 키가 맞지 않아요.' : '연결하지 못했어요. 웹 앱 배포 설정(액세스: 모든 사용자)을 확인해 주세요.'); }
-      const n = await gsPull(); toast(`구글 시트에 연결했어요${n ? ` · 경로 ${n}개를 불러왔어요` : ''}`);
+      if(!j.ok){ LS.set(K_GS, null); return alert(j.error==='key' ? '비밀 키가 맞지 않아요.\n스크립트의 SECRET 값과 같은지, SECRET을 바꾼 뒤 [배포 → 배포 관리 → 수정 → 새 버전]으로 다시 배포했는지 확인해 주세요.' : '연결하지 못했어요. 웹 앱 배포 설정(액세스: 모든 사용자)을 확인해 주세요.'); }
+      const local = savedList();
+      for(const r of local){ const k = await gsPost({ action:'save', route:{ v:PLAN_V, id:r.id, name:r.name, updated:r.updated, days:r.days } }); if(!k.ok) throw new Error(k.error); }
+      const n = await gsPull();
+      toast(`구글 시트에 연결했어요${local.length ? ` · 이 기기 경로 ${local.length}개를 시트에 보냈어요` : ''}${n ? ` · 시트에서 ${n}개를 불러왔어요` : ''}`);
     }
     if(a==='gspull'){ const n = await gsPull(); toast(n ? `시트에서 경로 ${n}개를 불러왔어요` : '시트에 새로 불러올 경로가 없어요'); refresh(); }
     if(a==='gspush'){ const list = savedList(); for(const r of list){ const j = await gsPost({ action:'save', route:{ v:PLAN_V, id:r.id, name:r.name, updated:r.updated, days:r.days } }); if(!j.ok) throw new Error(j.error); } toast(`경로 ${list.length}개를 구글 시트로 보냈어요`); }
     if(a==='gsoff'){ if(!confirm('구글 시트 연결을 해제할까요? 시트에 저장된 내용은 그대로 남아요.')) return; LS.set(K_GS, null); toast('연결을 해제했어요'); }
-  }catch(e){ alert('구글 시트와 통신하지 못했어요. 인터넷 연결과 웹 앱 주소를 확인해 주세요.'); }
+  }catch(e){
+    if(a==='gson') LS.set(K_GS, null);
+    alert(e && e.message==='key' ? '비밀 키가 맞지 않아요. 스크립트를 고쳤다면 새 버전으로 다시 배포해 주세요.'
+      : '구글 시트와 통신하지 못했어요.\n· 웹 앱 주소가 …/exec 로 끝나는지\n· 배포 액세스가 "모든 사용자"인지\n· 인터넷 연결\n을 확인해 주세요.');
+  }
   openRoutes();
 }
 /* 주소창에 ?gs=웹앱주소&gk=키 를 붙여 열면 연결 정보를 저장하고 주소에서 지움 (휴대폰 설정용) */
