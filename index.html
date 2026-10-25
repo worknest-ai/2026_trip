@@ -265,6 +265,12 @@ if(typeof L === 'undefined'){
   .gsdiag ul{ margin:8px 0 0; padding-left:18px; } .gsdiag li{ margin:4px 0; } .gsdiag code{ background:#0e1420; padding:1px 5px; border-radius:4px; font-size:12.5px; }
   .tab.addday{ border-style:dashed; color:#7ee0a1; } .tab.xtab{ border-color:#6b4e9a; } .pl2.xday .pn{ color:#c084fc; font-weight:800; margin-right:4px; }
   .uform.utime{ align-items:center; } .uform.utime label{ color:var(--tx2); font-size:13.5px; font-weight:700; } .uform.utime input{ flex:0 0 auto; } .uform.utime span{ flex:1 1 200px; color:var(--tx3); font-size:12.5px; line-height:1.5; }
+  .mapsw{ position:fixed; right:calc(var(--panel-w) + 14px); bottom:34px; z-index:1100; background:rgba(14,20,32,.93); border:1px solid var(--line2); border-radius:12px; padding:7px; box-shadow:0 6px 20px rgba(0,0,0,.4); }
+  .mapsw .msb{ display:flex; gap:4px; } .mapsw button{ background:var(--card); border:1px solid var(--line2); color:#cfd6e2; border-radius:8px; padding:6px 9px; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+  .mapsw button.on{ background:#24406f; border-color:#5b8def; color:#fff; } .mapsw button[data-m="act"].on{ background:#1d4a31; border-color:#2fd27a; }
+  .mapsw .mkey{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; font-size:12px; color:var(--tx2); } .mapsw .mkey span{ display:inline-flex; align-items:center; gap:5px; }
+  .mapsw .kp{ display:inline-block; width:22px; border-top:3px solid #9fb4d8; } .mapsw .kp.dash{ border-top-style:dashed; } .mapsw .ka{ display:inline-block; width:22px; border-top:4px solid #2fd27a; }
+  @media (max-width: 999px){ .mapsw{ position:absolute; right:22px; bottom:26px; padding:6px; } .mapsw button{ padding:5px 7px; font-size:12.5px; } }
   .vsw{ display:flex; gap:6px; margin-bottom:8px; } .vbtn{ flex:1; background:var(--card); border:1px solid var(--line2); color:#cfd6e2; border-radius:10px; padding:9px 8px; font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
   .vbtn.on{ background:#24406f; border-color:#5b8def; color:#fff; } .vbtn.act.on{ background:#1d4a31; border-color:#2fd27a; color:#fff; }
   .cfbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:9px; padding-top:8px; border-top:1px dashed #2c3850; }
@@ -900,7 +906,11 @@ function drawMap(){
   if(!HAS_MAP) return;
   MV.clear();
   const bounds = [];
-  if(VIEW==='act'){ drawAct(bounds); if(bounds.length){ try{ MV.fit(bounds); }catch(e){} } return; }
+  /* 지도 층: 예정(일차 색) · 확정(초록 실선) · 함께(예정은 점선으로) */
+  const showPlan = MAPV!=='act', showAct = MAPV!=='plan';
+  PLAN_DASH = MAPV==='both' && actCount() > 0;
+  renderMapSwitch();
+  if(showPlan){
   if(curDay === -1){
     DAYS.forEach((d,di)=>{
       dayLines(di, 4, .9, bounds);
@@ -920,7 +930,7 @@ function drawMap(){
     drawCustom(curDay, bounds);
   } else {
     const d = DAYS[curDay];
-    ROUTES[curDay].forEach(p=>{ MV.line(p,{color:d.color, weight:5, opacity:.95}); p.forEach(c=>bounds.push(c)); });
+    ROUTES[curDay].forEach(p=>{ MV.line(p,{color:d.color, weight:5, opacity:.95, dash:PLAN_DASH}); p.forEach(c=>bounds.push(c)); });
     let n = 0;
     d.items.forEach((it,ii)=>{
       if(it.type==='spot'){
@@ -937,6 +947,9 @@ function drawMap(){
     });
     (d.near||[]).forEach(nr=>{ addGen(nr, curDay); bounds.push(SPOTS[nr.key].coord); });
   }
+  }
+  if(showAct) drawActLayer(bounds);
+  if(!bounds.length) DAYS.forEach((d,di)=>{ if(curDay===-1 || curDay===di) ROUTES[di].forEach(p=>p.forEach(c=>bounds.push(c))); });
   if(bounds.length){ try{ MV.fit(bounds); }catch(e){} }
 }
 function addGen(n, di){
@@ -1188,9 +1201,9 @@ async function computeDay(di){
 /* 지도: 수정한 날은 계산된 도로 경로(없으면 점선 직선), 기본 일정은 원래 경로 */
 function dayLines(di, weight, opacity, bounds){
   const color = DAYS[di].color;
-  if(!PLAN.days[di]){ ROUTES[di].forEach(p=>{ MV.line(p,{color, weight, opacity}); p.forEach(c=>bounds.push(c)); }); return; }
+  if(!PLAN.days[di]){ ROUTES[di].forEach(p=>{ MV.line(p,{color, weight, opacity, dash:PLAN_DASH}); p.forEach(c=>bounds.push(c)); }); return; }
   const res = resFor(di);
-  if(res && res.geom){ MV.line(res.geom,{color, weight, opacity}); res.geom.forEach(c=>bounds.push(c)); return; }
+  if(res && res.geom){ MV.line(res.geom,{color, weight, opacity, dash:PLAN_DASH}); res.geom.forEach(c=>bounds.push(c)); return; }
   const pts = stopsOf(di).map(s=>stopInfo(di, s).coord);
   MV.line(pts,{color, weight, opacity, dash:true}); pts.forEach(c=>bounds.push(c));
   if(!res) computeDay(di).then(()=>{ if(curDay===-1 || curDay===di) drawMap(); });
@@ -1658,7 +1671,7 @@ function renderActDay(){
       <input id="aQ" type="search" enterkeyhint="search" placeholder="업체명 또는 주소" value="${esc(AU.q)}"><button class="pbtn on" id="aGo">검색</button></div>
     <div class="uform utime"><label for="aT">🕒 방문 시각</label><input id="aT" type="time" step="300" value="${esc(AU.t||'')}"><span>넣은 시각 순서에 끼워져요 · 비우면 ${nowHM(di) ? '지금 시각' : '마지막 방문 1시간 뒤'}로 넣어요</span></div>
     <div id="aRes" class="ures"></div></div></div>`;
-  h += `<div class="tip">💡 예정 경로는 지도에 회색 점선, 확정 경로는 초록 실선으로 함께 보여요. 숙소를 확정하면 그날 숙소는 하나만 남아요.</div>`;
+  h += `<div class="tip">💡 지도 오른쪽 아래 <b>[📅 예정] [✅ 확정] [함께]</b>로 골라 볼 수 있어요. 함께 보면 예정 경로는 일차 색 점선, 확정 경로는 초록 실선이에요. 숙소를 확정하면 그날 숙소는 하나만 남아요.</div>`;
   $('pbody').innerHTML = h;
   bindPlanBar();
   const pb = $('pbody');
@@ -1757,22 +1770,37 @@ function openActStop(di, j){
   MODAL.classList.add('open'); document.body.style.overflow = 'hidden';
   if(HAS_MAP) MV.fly(s.c);
 }
-/* 지도: 확정 보기 = 예정 경로(회색 점선) + 확정 경로(초록 실선·번호) */
-function drawAct(bounds){
+/* 지도 층 전환: 예정(일차 색) · 확정(초록 실선·번호) · 함께(예정은 점선) */
+const K_MAPV = 'trip26.mapv';
+let MAPV = ['plan','act','both'].includes(LS.get(K_MAPV, 'both')) ? LS.get(K_MAPV, 'both') : 'both';
+let PLAN_DASH = false;
+function renderMapSwitch(){
+  const wrap = document.querySelector('.mapwrap'); if(!wrap) return;
+  let el = document.getElementById('mapsw');
+  if(!el){ el = document.createElement('div'); el.id = 'mapsw'; el.className = 'mapsw'; wrap.appendChild(el); }
+  const dashed = MAPV==='both' && actCount() > 0;
+  el.innerHTML = `<div class="msb">${[['plan','📅 예정'],['act','✅ 확정'],['both','함께']].map(([k,l])=>`<button class="${MAPV===k?'on':''}" data-m="${k}">${l}</button>`).join('')}</div>
+    <div class="mkey">${MAPV!=='act' ? `<span><i class="kp${dashed?' dash':''}"></i>예정 ${dashed ? '점선' : '실선'}</span>` : ''}${MAPV!=='plan' ? `<span><i class="ka"></i>확정 초록 실선${actCount() ? '' : ' (아직 없음)'}</span>` : ''}</div>`;
+  el.querySelectorAll('[data-m]').forEach(b=>b.onclick=ev=>{ ev.stopPropagation(); MAPV = b.dataset.m; LS.set(K_MAPV, MAPV); drawMap(); });
+}
+/* 확정 경로 층 = 초록 실선 + 번호(일차 화면) / 일차 번호(전체 화면) */
+function drawActLayer(bounds){
   const days = curDay===-1 ? DAYS.map((d,i)=>i) : [curDay];
   days.forEach(di=>{
-    const plan = !PLAN.days[di] ? ROUTES[di] : (resFor(di) && resFor(di).geom ? [resFor(di).geom] : [stopsOf(di).map(s=>stopInfo(di, s).coord)]);
-    plan.forEach(p=>{ MV.line(p, { color:'#8a93a6', weight:3, opacity:.75, dash:true }); if(curDay!==-1) p.forEach(c=>bounds.push(c)); });
-    const A = ACT.days[di]; if(!A.length) return;
+    const A = ACT.days[di]; if(!A || !A.length) return;
     const r = ACT_RES[di] && ACT_RES[di].sig===actSig(di) ? ACT_RES[di] : null;
-    if(A.length > 1){ MV.line(r && r.geom ? r.geom : A.map(s=>s.c), { color:'#2fd27a', weight:5, opacity:.95, dash:!(r && r.geom) }); if(!r) actRoute(di).then(()=>{ if(VIEW==='act') drawMap(); }); }
+    if(A.length > 1){
+      const path = r && r.geom ? r.geom : A.map(s=>s.c);
+      MV.line(path, { color:'#0b2a18', weight:9, opacity:.55 });              /* 밑줄(테두리) — 예정선 위에서도 잘 보이게 */
+      MV.line(path, { color:'#2fd27a', weight:5, opacity:.98 });
+      if(!r) actRoute(di).then(()=>{ if(MAPV!=='plan') drawMap(); });
+    }
     A.forEach((s,j)=>{
       bounds.push(s.c);
-      MV.marker(s.c, { ...circ(`<div class="mk" style="background:#2f9e5b">${curDay===-1 ? di+1 : j+1}</div>`, curDay===-1 ? 22 : 26, 900),
-        tip:`${curDay===-1 ? (di+1)+'일차 · ' : ''}${s.cat==='stay' ? '숙박' : s.at} ${esc(s.name)}`, perm: curDay!==-1, click:()=>{ curDay = di; openActStop(di, j); } });
+      MV.marker(s.c, { ...circ(`<div class="mk" style="background:#2f9e5b;box-shadow:0 0 0 2px #0b2a18">${curDay===-1 ? di+1 : j+1}</div>`, curDay===-1 ? 22 : 26, 900),
+        tip:`✅ ${curDay===-1 ? (di+1)+'일차 · ' : ''}${s.cat==='stay' ? '숙박' : s.at} ${esc(s.name)}`, perm: curDay!==-1 && MAPV==='act', click:()=>openActStop(di, j) });
     });
   });
-  if(curDay===-1 && !bounds.length) DAYS.forEach((d,di)=>ROUTES[di].forEach(p=>p.forEach(c=>bounds.push(c))));
 }
 
 /* ---------------- 구글 시트 저장 (Apps Script 웹 앱) ----------------
