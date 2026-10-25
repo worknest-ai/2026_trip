@@ -1844,7 +1844,7 @@ function actSheetRows(){
 let GS_SHEET_HINT = false;
 async function gsSheets(which){
   if(!gsCfg()) return;
-  const hint = ()=>{ if(!GS_SHEET_HINT){ GS_SHEET_HINT = true; toast('시트에 "예정경로·확정경로" 탭을 만들려면 Apps Script를 새 버전으로 다시 배포해 주세요'); } };
+  const hint = ()=>{ if(!GS_SHEET_HINT){ GS_SHEET_HINT = true; setTimeout(()=>alert('구글 시트의 "경로"·"직접추가장소" 탭에는 저장됐어요.\n\n읽기 쉬운 "확정경로"·"예정경로" 탭도 만들려면 Apps Script를 한 번 업데이트해야 해요:\n1) 구글시트_연동_AppsScript.gs 내용을 Apps Script에 다시 붙여넣기\n2) 맨 위 SECRET을 지금 쓰는 값으로 맞추고 저장\n3) 배포 → 배포 관리 → ✏️ 수정 → 버전: 새 버전 → 배포'), 600); } };
   try{
     if(which!=='act'){ const j = await gsPost({ action:'sheet', tab:'plan', rows: await planSheetRows() }); if(!j.ok && j.error==='action') return hint(); }
     if(which!=='plan'){ const j = await gsPost({ action:'sheet', tab:'act', rows: actSheetRows() }); if(!j.ok && j.error==='action') return hint(); }
